@@ -194,7 +194,7 @@ def l(arg):
     # list directory of gtk/icon themes
     if arg == 'gtk':
         path = gtk_theme_path()
-    if arg == 'icons':
+    if arg == 'icon':
         path = icon_theme_path()
     
     return listDir(path)
@@ -216,7 +216,7 @@ def interact():
     parser.add_argument("--gtk", metavar="[URL]", action="store", help="download and install gnome gtk/shell theme.", type=str,)
     parser.add_argument("--icon", metavar="[URL]", action="store", help="download and install gnome icon theme.", type=str)
     parser.add_argument("--cursor", metavar="[URL]", action="store", help="download and install gnome cursor theme.", type=str)
-    parser.add_argument("-ls", action="store", help="List installed themes", type=str)
+    parser.add_argument("-ls", metavar="gtk | icon", action="store", help="List installed themes", type=str)
 
     args  = parser.parse_args()
 

@@ -1,10 +1,26 @@
 # Gnome-looks themes cli downloader
 
-## A cli-tool to download & install gnome based Icons, GTK, Cursor themes easily. 
+## A cli-tool to download & install gnome based Icons, GTK, Cursor themes easily
 
+### Installation
 
-### Help Page
-    ~$  gnomelook_
+**pre-requisits:** having installed `python3` `curl` `wget` `gnome-tweaks`
+
+    sudo apt install -y python3 python3-pip curl wget gnome-tweaks gnome-tweak-tool
+
+**Install `gnomelooks` script**
+
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/install.sh)"
+
+## gnomelooks
+
+To Install themes for current user use `gnomelooks`
+
+To Install themes globally use `sudo gnomelooks`
+
+## gnomelooks help Page
+
+    ~$  gnomelook -h
 
 
     usage: gnomelooks.py --gtk 'https://www.gnome-look.org/p/1253385/'
@@ -17,4 +33,4 @@
     --gtk [URL]     download and install gnome gtk/shell theme.
     --icon [URL]    download and install gnome icon theme.
     --cursor [URL]  download and install gnome cursor theme.
-    -ls LS          List installed themes
+    -ls [ gtk | icon ]         List installed themes
