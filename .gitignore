@@ -1,0 +1,6 @@
+.vscode/
+env/
+.temp/
+**tmp**
+.ipynb_checkpoints
+*.code-workspace
