@@ -5,7 +5,7 @@ gnomelooks_path="$HOME/.local/bin/gnomelooks"
 ext_path="$HOME/.local/share/gnome-shell/extensions"
 UUID="user-theme@gnome-shell-extensions.gcampax.github.com"
 
-# Install user theme extension of not present
+# Install user-theme extension of not present
 function user_theme_ext()
 {
     user_theme=$(echo $ext_path/$UUID)
@@ -23,6 +23,7 @@ function user_theme_ext()
     fi
 }
 
+# install gnomelook script
 function gnomelooks_setup()
 {   
     if ! [ -e "$HOME/.local/bin" ];then mkdir -p "$HOME/.local/bin";fi
@@ -33,6 +34,7 @@ function gnomelooks_setup()
     echo  "Restart terminal and type gnomelooks"
 }
 
+# check if folder for user-theme ext esists
 if [ -e $ext_path ];then
     user_theme_ext
 else
@@ -40,6 +42,9 @@ else
     user_theme_ext
 fi
 
+# check if gnomelooks exists
 if ! [ -e $gnomelooks_path ];then
     gnomelooks_setup
+else
+    echo "gnomelooks Exists"
 fi

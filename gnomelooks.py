@@ -128,7 +128,7 @@ def printTable(activeList):
 
 def log(filename, date, path, url):
     
-    logFile = f"/home/{os.environ.get('USER')}/.config/gnomelooks_log.csv"
+    logFile = f"{os.environ.get('HOME')}/.gnomelooks_log.csv"
     logFile_exist = os.path.isfile(logFile)
 
     with open(logFile,'a+') as csv_log:
@@ -155,7 +155,7 @@ def gtk_theme_path():
     if os.environ.get("USER") == "root":
         path = "/usr/share/themes"
     else:
-        path = f"""/home/{os.environ.get("USER")}/.local/share/themes"""
+        path = f"""{os.environ.get("HOME")}/.local/share/themes"""
     
     return path
 
@@ -165,7 +165,7 @@ def icon_theme_path():
     if os.environ.get("USER") == "root":
         path = "/usr/share/icons"
     else:
-        path = f"""/home/{os.environ.get("USER")}/.local/share/icons"""
+        path = f"""{os.environ.get("HOME")}/.local/share/icons"""
     return path
 
 
@@ -175,7 +175,7 @@ def cursor_theme_path():
     if os.environ.get("USER") == "root":
         path = "/usr/share/icons"
     else:
-        path = f"""/home/{os.environ.get("USER")}/.local/share/icons"""
+        path = f"""{os.environ.get("HOME")}/.local/share/icons"""
     return path
 
 
