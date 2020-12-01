@@ -10,7 +10,7 @@
 
 **Install `gnomelooks` script**
 
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/install.sh)"
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/install.sh)"
 
 ## gnomelooks
 
