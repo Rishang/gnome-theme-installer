@@ -25,8 +25,9 @@ To Install themes globally use `sudo gnomelooks`
 
     usage: gnomelooks.py --gtk 'https://www.gnome-look.org/p/1253385/'
 
-    Gnome Theme Downloader - This script downloads - Icon, Shell and Cursor themes form https://www.gnome-look.org/, and automatically installs it, Just visit "https://www.gnome-
-    look.org/" copy the url of the theme you want to install like the following example above showing, installing - Sweet theme.
+    Gnome Theme Downloader - This script downloads - Icon, Shell and Cursor themes form https://www.gnome-look.org/,
+    and automatically installs it, Just visit "https://www.gnome-look.org/" copy the url of the theme you want to install
+    like the following example above showing, installing - Sweet theme.
 
     OPTIONS:
     -h, --help      show this help message and exit
