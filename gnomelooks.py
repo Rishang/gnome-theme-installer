@@ -209,7 +209,7 @@ def interact():
             Just visit \"https://www.gnome-look.org/\" copy the url of the theme you want to install like the following example above showing,
             installing - Sweet theme.""",
 
-        usage=f"{Fore.LIGHTGREEN_EX}gnomelooks.py --gtk 'https://www.gnome-look.org/p/1253385/'{Fore.RESET}"
+        usage=f"{Fore.LIGHTGREEN_EX}gnomelooks --gtk 'https://www.gnome-look.org/p/1253385/'{Fore.RESET}"
     )
 
     parser._optionals.title = "OPTIONS"
