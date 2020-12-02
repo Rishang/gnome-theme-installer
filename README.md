@@ -20,7 +20,7 @@ To Install themes globally use `sudo gnomelooks`
 
 ## gnomelooks help Page
 
-    ~$  gnomelook -h
+    ~$  gnomelooks -h
 
 
     usage: gnomelooks --gtk 'https://www.gnome-look.org/p/1253385/'
