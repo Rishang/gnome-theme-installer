@@ -1,5 +1,5 @@
 # check if gnome  or not
-#if ! [[ $(command -v gnome-shell) ]];then echo "Error: gnome shell not found"; exit 1 ;fi
+if ! [[ $(command -v gnome-shell) ]];then echo "Error: gnome shell not found"; exit 1 ;fi
 
 gnomelooks_path="$HOME/.local/bin/gnomelooks"
 ext_path="$HOME/.local/share/gnome-shell/extensions"
