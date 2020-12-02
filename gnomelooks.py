@@ -62,14 +62,14 @@ def main(url, path):
         themeUrl = unquote(looksData[g_id]["url"])
 
         file = requests.get(themeUrl)
-        print("Downloading...")
+        print(f"Downloading {looksData[g_id]['name']} ....")
         
         # download file through downloadlink, 
         # and exit() if server status code other than 200.
         if file.status_code == 200:
             with open(f'{temp_dir}/{themeFile}','wb') as tar:
                 tar.write(file.content)
-            print(f"""Downloaded: {themeFile}""")
+            print(f"""Downloaded: {themeFile} at {temp_dir}""")
         else:
             print(f"Error: status_code {file.status_code}")
             exit()
