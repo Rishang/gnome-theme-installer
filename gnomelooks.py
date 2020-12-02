@@ -12,23 +12,30 @@ from colorama import Fore
 
 def main(url, path):
     
+    # where files will  get downloaded
     temp_dir="/tmp/gnomelooks_temp"
 
     print("Gnome-looks Theme-Downloader")
     
+    # is valid url input ?
     if "https://www.gnome-look.org/" not in url:
         print(Fore.RED +"Invalid URL." + Fore.RESET)
         return False
     
+    # create directory of theme path if not present
     if os.path.isdir(path) is False:
         os.makedirs(path)
 
     title, looksData = scrapGnomeLooks(url)
 
+    # title
     print(Fore.GREEN + '\nTheme-Name: '+ title + Fore.RESET)
+    # print, scraped data
     printTable(looksData)
 
-    print("\nEnter Id to download file:")
+    print(Fore.GREEN + "\nEnter Id to download file:" + Fore.RESET)
+    
+    # Get / check valid input
     try:
         # g_id is custom id of gnome theme/icon
         g_id = int(input())
@@ -40,12 +47,13 @@ def main(url, path):
             themeFile = looksData[g_id]["name"]
     
     except ValueError:
-        print("Enter Id [0-9]")
+        print("Enter Id , of integer type")
         exit()
     
     # download to temp_dir
     def download(g_id):
 
+        # create temp dir where tar files will be downloaded
         try:
             os.mkdir(temp_dir)
         except FileExistsError:
@@ -56,18 +64,20 @@ def main(url, path):
         file = requests.get(themeUrl)
         print("Downloading...")
         
+        # download file through downloadlink, 
+        # and exit() if server status code other than 200.
         if file.status_code == 200:
             with open(f'{temp_dir}/{themeFile}','wb') as tar:
                 tar.write(file.content)
             print(f"""Downloaded: {themeFile}""")
         else:
             print(f"Error: status_code {file.status_code}")
-            return False
+            exit()
     
     
-
     download(g_id)
     
+    # Extract ".tar" file to path, after download sucesses
     if ".tar" in themeFile:
         tarExtract(f'{temp_dir}/{themeFile}', path)
         print(f"""Extracted {themeFile}, at {path}""")
@@ -83,6 +93,7 @@ def scrapGnomeLooks(url):
 
     soup = BeautifulSoup(requests.get(url).text,'lxml')
     
+    # where a variable contain json data of theme-files
     script_tag_19 = soup.select_one('#od-body > script:nth-child(19)').string
     title = soup.select("#product-header-title > a")[0].text.strip()
 
@@ -90,7 +101,7 @@ def scrapGnomeLooks(url):
     pattern = r"filesJson = (\[.*\])"
     data = re.search(pattern, script_tag_19)[1]
     
-    
+    # collect active files and ignore archived ones.
     def collect_active(jsonList):
         
         active = []
@@ -101,13 +112,13 @@ def scrapGnomeLooks(url):
 
     return title, collect_active(json.loads(data))
 
-
+# print scraped data in form of tables 
 def printTable(activeList):
 
+    # get max_len_filename, to calc the area needed to printTable()
     len_filename = []
     for  i in range(len(activeList)):
         len_filename.append(len(activeList[i]['name']))
-    
     max_len_filename = max(len_filename)+1
 
     print( Fore.CYAN  + f"""\n{"Id":<4}| {"Filename":<{max_len_filename}}| {"Date":<10} | {"Downloads":<10}| {"Size":<8} |""" + Fore.RESET)
@@ -126,6 +137,7 @@ def printTable(activeList):
 
 
 
+# save csv log of downloaded files
 def log(filename, date, path, url):
     
     logFile = f"{os.environ.get('HOME')}/.gnomelooks_log.csv"
@@ -141,6 +153,7 @@ def log(filename, date, path, url):
         writer.writerow({"FILENAME": filename, "DATE": date, "PATH": path, "PAGE": url})
 
 
+# extract tar files
 def tarExtract(filename, directory):
 
     if os.path.isdir(directory) is False:
@@ -178,7 +191,7 @@ def cursor_theme_path():
         path = f"""{os.environ.get("HOME")}/.local/share/icons"""
     return path
 
-
+# print dirs
 def listDir(path):
 
     if os.path.isdir(path):
@@ -189,6 +202,7 @@ def listDir(path):
         return False
 
 
+# print list themes
 def l(arg):
     
     # list directory of gtk/icon themes
@@ -199,7 +213,7 @@ def l(arg):
     
     return listDir(path)
 
-
+# user args
 def interact():
 
     parser = argparse.ArgumentParser(
