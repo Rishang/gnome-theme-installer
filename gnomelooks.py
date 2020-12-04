@@ -10,97 +10,23 @@ import argparse
 from colorama import Fore
 
 
-def main(url, path):
-    
-    # where files will  get downloaded
-    temp_dir="/tmp/gnomelooks_temp"
-
-    print("Gnome-looks Theme-Downloader")
-    
-    # is valid url input ?
-    if "https://www.gnome-look.org/" not in url:
-        print(Fore.RED +"Invalid URL." + Fore.RESET)
-        return False
-    
-    # create directory of theme path if not present
-    if os.path.isdir(path) is False:
-        os.makedirs(path)
-
-    title, looksData = scrapGnomeLooks(url)
-
-    # title
-    print(Fore.GREEN + '\nTheme-Name: '+ title + Fore.RESET)
-    # print, scraped data
-    printTable(looksData)
-
-    print(Fore.GREEN + "\nEnter Id to download file:" + Fore.RESET)
-    
-    # Get / check valid input
-    try:
-        # g_id is custom id of gnome theme/icon
-        g_id = int(input())
-
-        if g_id > len(looksData)-1:
-            print(Fore.RED + f'Error: Id out of range, enter a valid Id\nRange of Id is between 0-{len(looksData)-1}' + Fore.RESET)
-            return False
-        else:
-            themeFile = looksData[g_id]["name"]
-    
-    except ValueError:
-        print("Enter Id , of integer type")
-        exit()
-    
-    # download to temp_dir
-    def download(g_id):
-
-        # create temp dir where tar files will be downloaded
-        try:
-            os.mkdir(temp_dir)
-        except FileExistsError:
-            pass
-        
-        themeUrl = unquote(looksData[g_id]["url"])
-
-        file = requests.get(themeUrl)
-        print(f"Downloading {looksData[g_id]['name']} ....")
-        
-        # download file through downloadlink, 
-        # and exit() if server status code other than 200.
-        if file.status_code == 200:
-            with open(f'{temp_dir}/{themeFile}','wb') as tar:
-                tar.write(file.content)
-            print(f"""Downloaded: {themeFile} at {temp_dir}""")
-        else:
-            print(f"Error: status_code {file.status_code}")
-            exit()
-    
-    
-    download(g_id)
-    
-    # Extract ".tar" file to path, after download sucesses
-    if ".tar" in themeFile:
-        tarExtract(f'{temp_dir}/{themeFile}', path)
-        print(f"""Extracted {themeFile}, at {path}""")
-        
-        log(themeFile, looksData[g_id]["updated_timestamp"], path, url)
-
-    else:
-        print("Error: Not a tar file.")
-        return False
-
-
 def scrapGnomeLooks(url):
 
-    soup = BeautifulSoup(requests.get(url).text,'lxml')
+    gnome_looks_page = requests.get(url)
+    if gnome_looks_page.status_code == 404:
+        print(Fore.RED+"Error: Page responded 404 (File not found)"+Fore.RESET)
+        exit()
+    
+    soup = BeautifulSoup(gnome_looks_page.text,'lxml')
     
     # where a variable contain json data of theme-files
     script_tag_19 = soup.select_one('#od-body > script:nth-child(19)').string
-    title = soup.select("#product-header-title")[0].text.strip().split("\n")[0].strip()
 
-    # collect filesJson -> list having json data in it
-    pattern = r"filesJson = (\[.*\])"
-    data = re.search(pattern, script_tag_19)[1]
+    # product info
+    product = re.search(r"product = ({.*})", script_tag_19)[1]
     
+    # collect filesJson -> list having json data in it
+    filesJson = re.search(r"filesJson = (\[.*\])", script_tag_19)[1]
     # collect active files and ignore archived ones.
     def collect_active(jsonList):
         
@@ -110,7 +36,7 @@ def scrapGnomeLooks(url):
                 active.append(jsonList[i])
         return active
 
-    return title, collect_active(json.loads(data))
+    return json.loads(product), collect_active(json.loads(filesJson))
 
 # print scraped data in form of tables 
 def printTable(activeList):
@@ -132,6 +58,7 @@ def printTable(activeList):
         sizeMB = round( int(activeList[i]['size']) / 1000000 , 3)
 
         print(f"""{i:<4}| {filename:<{max_len_filename}}| {updated_timestamp:<10} | {downloaded_count:<10}| {sizeMB:<6}MB |""")
+        # print(f"""{'':<4}| {'':<{max_len_filename}}| {'':<10} | {'':<10}| {'':<6}   |""")
     
     print( "-" * (4+max_len_filename+10+10+8 + 11) )
 
@@ -223,14 +150,14 @@ def interact():
             Just visit \"https://www.gnome-look.org/\" copy the url of the theme you want to install like the following example above showing,
             installing - Sweet theme.""",
 
-        usage=f"{Fore.LIGHTGREEN_EX}gnomelooks --gtk 'https://www.gnome-look.org/p/1253385/'{Fore.RESET}"
+        usage=f"{Fore.LIGHTGREEN_EX}gnomelooks [OPTIONS] [URL]{Fore.RESET}\n\n Example: gnomelooks --gtk \'https://www.gnome-look.org/p/1253385/\'"
     )
 
     parser._optionals.title = "OPTIONS"
     parser.add_argument("--gtk", metavar="[URL]", action="store", help="download and install gnome gtk/shell theme.", type=str,)
     parser.add_argument("--icon", metavar="[URL]", action="store", help="download and install gnome icon theme.", type=str)
     parser.add_argument("--cursor", metavar="[URL]", action="store", help="download and install gnome cursor theme.", type=str)
-    parser.add_argument("-ls", metavar="gtk | icon", action="store", help="List installed themes", type=str)
+    parser.add_argument("-ls", metavar="[gtk | icon]", action="store", help="list installed themes", type=str)
 
     args  = parser.parse_args()
 
@@ -256,6 +183,99 @@ def interact():
     
     if 'path' in locals():
         main(url, path)
+
+
+
+def main(url, path):
+    
+    # where files will  get downloaded
+    temp_dir="/tmp/gnomelooks_temp"
+
+    print("Gnome-looks Theme-Downloader")
+    
+    # is valid url input ?
+    if "https://www.gnome-look.org/" not in url and "https://www.pling.com/" not in url:
+        print(Fore.RED +"Invalid URL." + Fore.RESET)
+        return False
+    
+    # create directory of theme path if not present
+    if os.path.isdir(path) is False:
+        os.makedirs(path)
+
+    product, looksData = scrapGnomeLooks(url)
+
+    # print, scraped data
+    
+    # product
+    print(Fore.GREEN + '\nTheme-Name: '+ product["title"] + Fore.MAGENTA + f"\tLikes: {product['count_likes']}" + Fore.BLUE + f"\tCreator: {product['username']}\n" + Fore.RESET )
+
+    # product description
+    description = re.sub(r"\[\/?b|B\]|\[\/?url\]|\[\/?color.+\]|\[\/?code\]|\[\/?|\]", "", product["description"])
+    print(Fore.CYAN+ "Description\n" + Fore.RESET + description)
+
+    # product category
+    print(Fore.YELLOW + f"\nCategory: {product['cat_title']}" + Fore.RESET)
+        
+    # scraped file json data
+    printTable(looksData)
+
+    print(Fore.GREEN + "\nEnter Id to download & install Theme file:" + Fore.RESET)
+    
+    # Get / check valid input
+    try:
+        # g_id is custom id of gnome theme/icon
+        g_id = int(input())
+
+        if g_id > len(looksData)-1:
+            print(Fore.RED + f'Error: Id out of range, enter a valid Id\nRange of Id is between 0-{len(looksData)-1}' + Fore.RESET)
+            return False
+        else:
+            themeFile = looksData[g_id]["name"]
+    
+    except ValueError:
+        print("Enter Id , of integer type")
+        exit()
+    
+    # download to temp_dir
+    def download(g_id):
+
+        # create temp dir where tar files will be downloaded
+        try:
+            os.mkdir(temp_dir)
+        except FileExistsError:
+            pass
+        
+        themeUrl = unquote(looksData[g_id]["url"])
+
+        print(f"Downloading {looksData[g_id]['name']} ....")
+        file = requests.get(themeUrl)
+        
+        # download file through downloadlink, 
+        # and exit() if server status code other than 200.
+        if file.status_code == 200:
+            with open(f'{temp_dir}/{themeFile}','wb') as tar:
+                tar.write(file.content)
+            print(f"""Downloaded: {themeFile} at {temp_dir}""")
+        else:
+            print(f"Error: status_code {file.status_code}")
+            exit()
+    
+    
+    download(g_id)
+    
+    # Extract ".tar" file to path, after download sucesses
+    if ".tar" in themeFile:
+        tarExtract(f'{temp_dir}/{themeFile}', path)
+        print(f"""Extracted {themeFile}, at {path}""")
+        
+        log(themeFile, looksData[g_id]["updated_timestamp"], path, url)
+
+    else:
+        print("Error: Not a tar file.")
+        return False
+    
+    print(Fore.GREEN + "\nAll set, Theme has been isntalled\nHere is where you can see your installed theme")
+    print(Fore.LIGHTMAGENTA_EX + "Open: gnome-tweaks > Appearance > Applications" + Fore.RESET)
 
 
 if __name__ == '__main__':
