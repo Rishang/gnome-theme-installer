@@ -11,12 +11,14 @@ function user_theme_ext()
     user_theme=$(echo $ext_path/$UUID)
     
     if ! [ -e $user_theme ];then
+        echo "getting user-theme extension for gnome tweaks."
         user_theme_dir="$ext_path/$UUID"
-        
-        wget https://extensions.gnome.org/extension-data/user-themegnome-shell-extensions.gcampax.github.com.v41.shell-extension.zip  -P /tmp
+        theme_ext_url="https://extensions.gnome.org/extension-data/user-themegnome-shell-extensions.gcampax.github.com.v41.shell-extension.zip"
+        theme_ext_zip="user-themegnome-shell-extensions.gcampax.github.com.v41.shell-extension.zip"
+        curl -sS "$theme_ext_url"  -o "/tmp/$theme_ext_zip"
         
         mkdir -p $user_theme_dir
-        unzip /tmp/user-themegnome-shell-extensions.gcampax.github.com.v41.shell-extension.zip -d $user_theme_dir
+        unzip /tmp/$theme_ext_zip -d $user_theme_dir
     
     else
         echo "Extension: user-themes exise."
