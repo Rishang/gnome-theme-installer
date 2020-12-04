@@ -4,9 +4,9 @@
 
 ### Installation
 
-**pre-requisits:** having installed `python3` `curl` `wget` `gnome-tweaks` `unzip`
+**pre-requisits:** having installed `python3` `curl` `gnome-tweaks` `unzip`
 
-    sudo apt install -y python3 python3-pip curl wget gnome-tweaks gnome-tweak-tool unzip
+    sudo apt install -y python3 python3-pip curl gnome-tweaks gnome-tweak-tool unzip
 
 **Install `gnomelooks` script**
 
