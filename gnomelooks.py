@@ -95,7 +95,7 @@ def scrapGnomeLooks(url):
     
     # where a variable contain json data of theme-files
     script_tag_19 = soup.select_one('#od-body > script:nth-child(19)').string
-    title = soup.select("#product-header-title > a")[0].text.strip()
+    title = soup.select("#product-header-title")[0].text.strip().split("\n")[0].strip()
 
     # collect filesJson -> list having json data in it
     pattern = r"filesJson = (\[.*\])"
