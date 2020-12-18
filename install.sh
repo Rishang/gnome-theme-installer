@@ -37,8 +37,8 @@ function user_theme_ext()
     if ! [ -e $user_theme ];then
         echo "getting user-theme extension for gnome tweaks."
         user_theme_dir="$ext_path/$UUID"
-        theme_ext_url="https://extensions.gnome.org/extension-data/user-themegnome-shell-extensions.gcampax.github.com.v41.shell-extension.zip"
-        theme_ext_zip="user-themegnome-shell-extensions.gcampax.github.com.v41.shell-extension.zip"
+        theme_ext_url="https://extensions.gnome.org/extension-data/user-themegnome-shell-extensions.gcampax.github.com.v42.shell-extension.zip"
+        theme_ext_zip="user-themegnome-shell-extensions.gcampax.github.com.v42.shell-extension.zip"
         curl -sS "$theme_ext_url"  -o "/tmp/$theme_ext_zip"
         
         mkdir -p $user_theme_dir
@@ -65,12 +65,7 @@ function gnomelooks_setup()
     
     chmod +x "$gnomelooks_path/gnomelooks.py"
 
-    # soft link
-    echo -e "\n linking gnomelooks.py to ~/.local/bin/gnomelooks"
-    ln -s "$gnomelooks_path/gnomelooks.py" "$HOME/.local/bin/gnomelooks"
-    
     echo -e "Done\n"
-    echo  "Restart terminal and type gnomelooks"
 }
 
 # check this first, and only then continue
@@ -86,7 +81,15 @@ fi
 
 # check if gnomelooks exists
 if ! [ -e $gnomelooks_path ];then
+    
     gnomelooks_setup
+    # soft link
+    echo -e "\e[32m \nDone\nNOTE:  Link gnomelooks to /usr/local/bin  by copying the  command  given  below.\n"
+    
+    echo -e "COPY: \e[36msudo ln -s $gnomelooks_path/gnomelooks.py /usr/local/bin/gnomelooks\e[39m"
+
+    echo -e "\nAfter linking to /usr/local/bin Restart terminal and type \e[32mgnomelooks\e[39m"
+    
 else
     echo "gnomelooks Exists"
 fi
