@@ -14,25 +14,22 @@
 
 ## gnomelooks
 
-To Install themes for current user use `gnomelooks`
+To Install themes for current user `gnomelooks -i [URL]`
 
-To Install themes globally use `sudo gnomelooks`
-
+To Install themes globally `sudo gnomelooks -i [URL]`
 
 ## gnomelooks help Page
 
     ~$  gnomelooks -h
+        usage: gnomelooks [OPTIONS] [URL]
 
+        Example: gnomelooks -i 'https://www.gnome-look.org/p/1253385/'
 
-    usage: gnomelooks --gtk 'https://www.gnome-look.org/p/1253385/'
+        Gnome Theme Downloader - This script downloads - Icon, Shell and Cursor themes form https://www.gnome-look.org/, and automatically installs it, Just visit "https://www.gnome-look.org/" copy the url of the theme you
+        want to install like the following example above showing, installing - Sweet theme.
 
-    Gnome Theme Downloader - This script downloads - Icon, Shell and Cursor themes form https://www.gnome-look.org/,
-    and automatically installs it, Just visit "https://www.gnome-look.org/" copy the url of the theme you want to install
-    like the following example above showing, installing - Sweet theme.
-
-    OPTIONS:
-    -h, --help      show this help message and exit
-    --gtk [URL]     download and install gnome gtk/shell theme.
-    --icon [URL]    download and install gnome icon theme.
-    --cursor [URL]  download and install gnome cursor theme.
-    -ls [ gtk | icon ]         List installed themes
+        OPTIONS:
+        -h, --help        show this help message and exit
+        -i [URL]          Install gnome - GTK/Shell ,Icon, Cursor theme.
+        -ls [gtk | icon]  List installed themes
+        -rm [theme name]  Remove any installed themes

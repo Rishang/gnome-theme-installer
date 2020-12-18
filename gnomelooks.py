@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
 import json, csv
-import os, subprocess
+import os, subprocess, shutil
 import argparse
 from colorama import Fore
 
@@ -43,6 +43,7 @@ def printTable(activeList):
 
     # get max_len_filename, to calc the area needed to printTable()
     len_filename = []
+    
     for  i in range(len(activeList)):
         len_filename.append(len(activeList[i]['name']))
     max_len_filename = max(len_filename)+1
@@ -128,6 +129,16 @@ def listDir(path):
         print(Fore.RED + "Error: Given path is not a directory" + Fore.RESET)
         return False
 
+def rmDir(themeName):
+    
+    path = [icon_theme_path(), gtk_theme_path()]
+    for p in path:
+        if os.path.isdir(p + f"/{themeName}"):
+            shutil.rmtree(p + f"/{themeName}")
+            print(f"Removed: {themeName}")
+            return True
+    print(Fore.RED+'Theme not found'+Fore.RESET)
+    return False
 
 # print list themes
 def l(arg):
@@ -135,10 +146,12 @@ def l(arg):
     # list directory of gtk/icon themes
     if arg == 'gtk':
         path = gtk_theme_path()
-    if arg == 'icon':
+    elif arg == 'icon':
         path = icon_theme_path()
-    
-    return listDir(path)
+    else:
+        print(Fore.RED+'Invalid argument'+Fore.RESET)
+        exit()
+    return path
 
 # user args
 def interact():
@@ -150,43 +163,33 @@ def interact():
             Just visit \"https://www.gnome-look.org/\" copy the url of the theme you want to install like the following example above showing,
             installing - Sweet theme.""",
 
-        usage=f"{Fore.LIGHTGREEN_EX}gnomelooks [OPTIONS] [URL]{Fore.RESET}\n\n Example: gnomelooks --gtk \'https://www.gnome-look.org/p/1253385/\'"
+        usage=f"{Fore.LIGHTGREEN_EX}gnomelooks [OPTIONS] [URL]{Fore.RESET}\n\n Example: gnomelooks -i \'https://www.gnome-look.org/p/1253385/\'"
     )
 
     parser._optionals.title = "OPTIONS"
-    parser.add_argument("--gtk", metavar="[URL]", action="store", help="download and install gnome gtk/shell theme.", type=str,)
-    parser.add_argument("--icon", metavar="[URL]", action="store", help="download and install gnome icon theme.", type=str)
-    parser.add_argument("--cursor", metavar="[URL]", action="store", help="download and install gnome cursor theme.", type=str)
+    parser.add_argument("-i", metavar="[URL]", action="store", help="Install gnome - GTK/Shell ,Icon, Cursor theme.", type=str,)
     parser.add_argument("-ls", metavar="[gtk | icon]", action="store", help="list installed themes", type=str)
+    parser.add_argument("-rm", metavar="theme name", action="store", help="remove any installed themes", type=str)
 
     args  = parser.parse_args()
 
-
-    if args.gtk:
-        url = args.gtk
-        path = gtk_theme_path()
-        
-    elif args.icon:
-        url = args.icon
-        path = icon_theme_path()
-    
-    elif args.cursor:
-        url = args.cursor
-        path = cursor_theme_path()  
+    if args.i:
+        url = args.i
+        main(url)
     
     elif args.ls:
-        l(args.ls)
+        path = l(args.ls)
+        listDir(path)
+    
+    elif args.rm:
+        rmDir(args.rm)
     
     else:
         parser.print_help()
         return False
-    
-    if 'path' in locals():
-        main(url, path)
 
-
-
-def main(url, path):
+# main
+def main(url):
     
     # where files will  get downloaded
     temp_dir="/tmp/gnomelooks_temp"
@@ -197,12 +200,24 @@ def main(url, path):
     if "https://www.gnome-look.org/" not in url and "https://www.pling.com/" not in url:
         print(Fore.RED +"Invalid URL." + Fore.RESET)
         return False
-    
-    # create directory of theme path if not present
-    if os.path.isdir(path) is False:
-        os.makedirs(path)
 
     product, looksData = scrapGnomeLooks(url)
+
+    # detect install path
+
+    if product['cat_title'] == "GTK3 Themes":
+        path = gtk_theme_path()
+    elif product['cat_title'] == "Full Icon Themes":
+        path = icon_theme_path()
+    elif product['cat_title'] == "Cursors":
+        path = icon_theme_path()
+    else:
+        path = '.'
+
+    # create directory of theme path if not present
+    
+    if os.path.isdir(path) is False:
+        os.makedirs(path)
 
     # print, scraped data
     
