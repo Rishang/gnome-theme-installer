@@ -9,6 +9,8 @@ import os, subprocess, shutil
 import argparse
 from colorama import Fore
 
+USER = os.environ.get("USER")
+HOME = os.environ.get("HOME")
 
 def scrapGnomeLooks(url):
 
@@ -68,7 +70,7 @@ def printTable(activeList):
 # save csv log of downloaded files
 def log(filename, date, path, url):
     
-    logFile = f"{os.environ.get('HOME')}/.gnomelooks_log.csv"
+    logFile = f"{HOME}/.gnomelooks_log.csv"
     logFile_exist = os.path.isfile(logFile)
 
     with open(logFile,'a+') as csv_log:
@@ -93,30 +95,30 @@ def tarExtract(filename, directory):
 
 def gtk_theme_path():
 
-    if os.environ.get("USER") == "root":
+    if USER == "root":
         path = "/usr/share/themes"
     else:
-        path = f"""{os.environ.get("HOME")}/.local/share/themes"""
+        path = f"""{HOME}/.local/share/themes"""
     
     return path
 
 
 def icon_theme_path():
 
-    if os.environ.get("USER") == "root":
+    if USER == "root":
         path = "/usr/share/icons"
     else:
-        path = f"""{os.environ.get("HOME")}/.local/share/icons"""
+        path = f"""{HOME}/.local/share/icons"""
     return path
 
 
 def cursor_theme_path():
 
     # cursor and icon themes are located at same path
-    if os.environ.get("USER") == "root":
+    if USER == "root":
         path = "/usr/share/icons"
     else:
-        path = f"""{os.environ.get("HOME")}/.local/share/icons"""
+        path = f"""{HOME}/.local/share/icons"""
     return path
 
 # print dirs
@@ -192,7 +194,7 @@ def interact():
 def main(url):
     
     # where files will  get downloaded
-    temp_dir="/tmp/gnomelooks_temp"
+    temp_dir=f"/tmp/gnomelooks_temp_{USER}"
 
     print("Gnome-looks Theme-Downloader")
     
