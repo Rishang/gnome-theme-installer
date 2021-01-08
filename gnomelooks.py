@@ -291,7 +291,7 @@ def main(url):
         print("Error: Not a tar file.")
         return False
     
-    print(Fore.GREEN + "\nAll set, Theme has been isntalled\nHere is where you can see your installed theme")
+    print(Fore.GREEN + "\nAll set, Theme has been installed\nHere is where you can see your installed theme")
     print(Fore.LIGHTMAGENTA_EX + "Open: gnome-tweaks > Appearance > Applications" + Fore.RESET)
 
 
