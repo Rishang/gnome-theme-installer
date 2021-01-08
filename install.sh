@@ -86,9 +86,9 @@ if ! [ -e $gnomelooks_path ];then
     # soft link
     echo -e "\e[32m \nDone\nNOTE:  Link gnomelooks to /usr/local/bin  by copying the  command  given  below.\n"
     
-    echo -e "COPY: \e[36msudo ln -s $gnomelooks_path/gnomelooks.py /usr/local/bin/gnomelooks\e[39m"
+    echo -e "COPY: \e[36msudo ln -s $gnomelooks_path/gnomelooks.py /usr/local/bin/gnomelooks && exec bash\e[39m"
 
-    echo -e "\nAfter linking to /usr/local/bin Restart terminal and type \e[32mgnomelooks\e[39m"
+    echo -e "\nAfter executing above line, type \e[32mgnomelooks\e[39m"
     
 else
     echo "gnomelooks Exists"
