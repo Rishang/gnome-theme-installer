@@ -12,7 +12,7 @@ elif [[ `command -v yum` ]];then
     package_installer="yum"
 fi
 
-function test_requirement_packages
+function _test_requirement_packages
 {
     echo -e "Checking if needed packages exist.\n"
     local needed=("curl" "git" "python3" "pip3" "curl" "gnome-tweaks")
@@ -21,7 +21,7 @@ function test_requirement_packages
         if ! [[ `command -v "$p"` ]];then
             echo "Error: package $p not found."
             echo -e "\ninstall needed packages. and try again."
-            echo -e "\nRun: sudo $package_installer install curl git python3 python3-pip curl gnome-tweaks"
+            echo -e "\nRun: sudo $package_installer install -y curl git python3 python3-pip curl gnome-tweaks"
             echo 
             return 1
         fi
@@ -30,7 +30,7 @@ function test_requirement_packages
 
 
 # Install user-theme extension of not present
-function user_theme_ext()
+function _user_theme_ext()
 {
     user_theme=$(echo $ext_path/$UUID)
     
@@ -45,12 +45,12 @@ function user_theme_ext()
         unzip /tmp/$theme_ext_zip -d $user_theme_dir
     
     else
-        echo "Extension: user-themes exise."
+        echo "Extension: user-themes exist."
     fi
 }
 
 # install gnomelook script
-function gnomelooks_setup()
+function _gnomelooks_setup()
 {   
     if ! [ -e "$HOME/.local/bin" ];then
         mkdir -p "$HOME/.local/bin"
@@ -69,20 +69,20 @@ function gnomelooks_setup()
 }
 
 # check this first, and only then continue
-if ! test_requirement_packages;then exit 1;fi
+if ! _test_requirement_packages;then exit 1;fi
 
 # check if folder for user-theme ext exist
 if [ -e $ext_path ];then
-    user_theme_ext
+    _user_theme_ext
 else
     mkdir -p $ext_path
-    user_theme_ext
+    _user_theme_ext
 fi
 
 # check if gnomelooks exists
 if ! [ -e $gnomelooks_path ];then
     
-    gnomelooks_setup
+    _gnomelooks_setup
     # soft link
     echo -e "\e[32m \nDone\nNOTE:  Link gnomelooks to /usr/local/bin  by copying the  command  given  below.\n"
     
