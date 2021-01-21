@@ -22,13 +22,26 @@ def scrapGnomeLooks(url):
     soup = BeautifulSoup(gnome_looks_page.text,'lxml')
     
     # where a variable contain json data of theme-files
-    script_tag_19 = soup.select_one('#od-body > script:nth-child(19)').string
-
+    try:
+        apiData = soup.select_one('#od-body > script:nth-child(20)').string
+        re.search(r"filesJson = ", apiData)
+    except TypeError:
+        # if api-json is not present at jspath, bruteforce for jspath
+        script_child=[15,16,17,18,19,20,21,22,23,24,25]
+        for blind_id in script_child:
+            try:
+                apiData = soup.select_one(f'#od-body > script:nth-child({blind_id})').string
+                if re.search(r"filesJson = \[", apiData):
+                    break
+            except:
+                continue
+    
     # product info
-    product = re.search(r"product = ({.*})", script_tag_19)[1]
+    product = re.search(r"product = ({.*})", apiData)[1]
     
     # collect filesJson -> list having json data in it
-    filesJson = re.search(r"filesJson = (\[.*\])", script_tag_19)[1]
+    filesJson = re.search(r"filesJson = (\[.*\])", apiData)[1]
+    
     # collect active files and ignore archived ones.
     def collect_active(jsonList):
         
@@ -66,7 +79,6 @@ def printTable(activeList):
     print( "-" * (4+max_len_filename+10+10+8 + 11) )
 
 
-
 # save csv log of downloaded files
 def log(filename, date, path, url):
     
@@ -93,32 +105,13 @@ def tarExtract(filename, directory):
     subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 
 
-def gtk_theme_path():
-
+def theme_path(arg):
+    # themes
+    # icons
     if USER == "root":
-        path = "/usr/share/themes"
+        path = f"/usr/share/{arg}"
     else:
-        path = f"""{HOME}/.local/share/themes"""
-    
-    return path
-
-
-def icon_theme_path():
-
-    if USER == "root":
-        path = "/usr/share/icons"
-    else:
-        path = f"""{HOME}/.local/share/icons"""
-    return path
-
-
-def cursor_theme_path():
-
-    # cursor and icon themes are located at same path
-    if USER == "root":
-        path = "/usr/share/icons"
-    else:
-        path = f"""{HOME}/.local/share/icons"""
+        path = f"""{HOME}/.local/share/{arg}"""
     return path
 
 # print dirs
@@ -133,7 +126,7 @@ def listDir(path):
 
 def rmDir(themeName):
     
-    path = [icon_theme_path(), gtk_theme_path()]
+    path = [theme_path("icons"), theme_path("themes")]
     for p in path:
         if os.path.isdir(p + f"/{themeName}"):
             shutil.rmtree(p + f"/{themeName}")
@@ -147,9 +140,9 @@ def l(arg):
     
     # list directory of gtk/icon themes
     if arg == 'gtk':
-        path = gtk_theme_path()
+        path = theme_path("themes")
     elif arg == 'icon':
-        path = icon_theme_path()
+        path = theme_path("icons")
     else:
         print(Fore.RED+'Invalid argument'+Fore.RESET)
         exit()
@@ -208,11 +201,11 @@ def main(url):
     # detect install path
 
     if product['cat_title'] == "GTK3 Themes":
-        path = gtk_theme_path()
+        path = theme_path("themes")
     elif product['cat_title'] == "Full Icon Themes":
-        path = icon_theme_path()
+        path = theme_path("icons")
     elif product['cat_title'] == "Cursors":
-        path = icon_theme_path()
+        path = theme_path("icons")
     else:
         path = '.'
 
