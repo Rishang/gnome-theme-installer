@@ -200,13 +200,14 @@ def main(url):
 
     # detect install path
 
-    if product['cat_title'] == "GTK3 Themes":
+    if product['cat_title'] == "GTK3/4 Themes":
         path = theme_path("themes")
     elif product['cat_title'] == "Full Icon Themes":
         path = theme_path("icons")
     elif product['cat_title'] == "Cursors":
         path = theme_path("icons")
     else:
+        print(Fore.YELLOW + "WARNING: Can't identify product category" + Fore.RESET)
         path = '.'
 
     # create directory of theme path if not present
@@ -229,7 +230,8 @@ def main(url):
     # scraped file json data
     printTable(looksData)
 
-    print(Fore.GREEN + "\nEnter Id to download & install Theme file:" + Fore.RESET)
+    print(f"Install Path: {path}")
+    print(Fore.GREEN + "\nEnter Id to download & install Theme file:" + Fore.RESET, end=" ")
     
     # Get / check valid input
     try:
