@@ -135,19 +135,6 @@ def rmDir(themeName):
     print(Fore.RED+'Theme not found'+Fore.RESET)
     return False
 
-# print list themes
-def l(arg):
-    
-    # list directory of gtk/icon themes
-    if arg == 'gtk':
-        path = theme_path("themes")
-    elif arg == 'icon':
-        path = theme_path("icons")
-    else:
-        print(Fore.RED+'Invalid argument'+Fore.RESET)
-        exit()
-    return path
-
 # user args
 def interact():
 
@@ -173,7 +160,13 @@ def interact():
         main(url)
     
     elif args.ls:
-        path = l(args.ls)
+        if args.ls == 'gtk':
+            path = theme_path("themes")
+        elif args.ls == 'icon':
+            path = theme_path("icons")
+        else:
+            print(Fore.RED+'Invalid argument'+Fore.RESET)
+            exit()
         listDir(path)
     
     elif args.rm:
