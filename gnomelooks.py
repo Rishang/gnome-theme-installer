@@ -10,7 +10,8 @@ import argparse
 from colorama import Fore
 
 USER = os.environ.get("USER")
-HOME = os.environ.get("HOME")
+SUDO_USER = os.environ.get("SUDO_USER")
+HOME = (SUDO_USER and f"/home/{SUDO_USER}") or os.environ.get("HOME")
 
 
 def scrapGnomeLooks(url):
@@ -91,7 +92,7 @@ def printTable(activeList):
 # save csv log of downloaded files
 def log(filename, date, path, url):
 
-    logFile = f"{HOME}/.gnomelooks_log.csv"
+    logFile = f"{HOME}/.gnomelooks/gnomelooks_log.csv"
     logFile_exist = os.path.isfile(logFile)
 
     with open(logFile, "a+") as csv_log:
@@ -102,6 +103,12 @@ def log(filename, date, path, url):
             writer.writeheader()
 
         writer.writerow({"FILENAME": filename, "DATE": date, "PATH": path, "PAGE": url})
+        print(f"Logs saved at: {logFile}")
+        if USER == "root":
+            SUDO_GID = int(os.environ.get('SUDO_GID'))
+            SUDO_UID = int(os.environ.get('SUDO_UID'))
+            os.chown(logFile, SUDO_GID, SUDO_UID )
+    csv_log.close()
 
 
 # extract tar files
@@ -117,10 +124,7 @@ def tarExtract(filename, directory):
 def theme_path(arg):
     # themes
     # icons
-    if USER == "root":
-        path = f"/usr/share/{arg}"
-    else:
-        path = f"""{HOME}/.local/share/{arg}"""
+    path = (USER == "root" and f"/usr/share/{arg}") or f"{HOME}/.local/share/{arg}"
     return path
 
 

@@ -4,3 +4,4 @@ env/
 **tmp**
 .ipynb_checkpoints
 *.code-workspace
+*.csv
