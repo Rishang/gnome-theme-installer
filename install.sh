@@ -61,7 +61,7 @@ function _gnomelooks_setup()
     pip3 install $(curl -fsSl "https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/requirements.txt")
     
     echo -e "\n Cloaning gnome-theme-installer at ~/.gnomelooks"
-    git clone --depth 1 "https://github.com/Rishang/gnome-theme-installer.git" $gnomelooks_path || ( cd $gnomelooks_path ; cd - )
+    git clone --depth 1 "https://github.com/Rishang/gnome-theme-installer.git" $gnomelooks_path
     
     chmod +x "$gnomelooks_path/gnomelooks.py"
 
@@ -92,4 +92,7 @@ if ! [ -e $gnomelooks_path ];then
     
 else
     echo "gnomelooks Exists"
+    cd $gnomelooks_path
+    git pull origin master
+    cd -
 fi
