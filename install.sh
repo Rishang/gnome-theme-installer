@@ -92,4 +92,7 @@ if ! [ -e $gnomelooks_path ];then
     
 else
     echo "gnomelooks Exists"
+    cd $gnomelooks_path
+    git pull origin master
+    cd -
 fi
