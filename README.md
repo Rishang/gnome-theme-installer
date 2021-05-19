@@ -2,6 +2,10 @@
 
 ## A cli-tool to download & install gnome based Icons, GTK, Cursor themes easily
 
+![image 1](https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/.github/images/1.png)
+
+![image 2](https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/.github/images/2.png)
+
 ### Installation
 
 **pre-requisits:** having installed `python3` `curl` `gnome-tweaks` `unzip`
