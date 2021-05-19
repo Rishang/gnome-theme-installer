@@ -14,11 +14,34 @@ SUDO_USER = os.environ.get("SUDO_USER")
 HOME = (SUDO_USER and f"/home/{SUDO_USER}") or os.environ.get("HOME")
 
 
+class Message:
+    def __init__(self):
+        pass
+
+    def error(self, message: str):
+        print(Fore.RED + "ERROR: " + message + Fore.RESET)
+
+    def sucesses(self, message: str):
+        print(Fore.GREEN + message + Fore.RESET)
+
+    def warning(self, message: str):
+        print(Fore.YELLOW + "WARNING: " + message + Fore.RESET)
+
+    def info(self, message: str):
+        print(Fore.LIGHTMAGENTA_EX + message + Fore.RESET)
+
+    def title(self, message: str):
+        print(Fore.LIGHTCYAN_EX + message + Fore.RESET)
+
+
+message = Message()
+
+
 def scrapGnomeLooks(url):
 
     gnome_looks_page = requests.get(url)
     if gnome_looks_page.status_code == 404:
-        print(Fore.RED + "Error: Page responded 404 (File not found)" + Fore.RESET)
+        message.error("Page responded 404 (File not found)")
         exit()
 
     soup = BeautifulSoup(gnome_looks_page.text, "lxml")
@@ -27,7 +50,9 @@ def scrapGnomeLooks(url):
     try:
         apiData = soup.select_one("#od-body > script:nth-child(20)").string
         re.search(r"filesJson = ", apiData)
+    
     except TypeError:
+        EXIT_FLAG = False
         # if api-json is not present at jspath, bruteforce for jspath
         script_child = [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
         for blind_id in script_child:
@@ -36,9 +61,16 @@ def scrapGnomeLooks(url):
                     f"#od-body > script:nth-child({blind_id})"
                 ).string
                 if re.search(r"filesJson = \[", apiData):
+                    EXIT_FLAG = False
                     break
             except:
+                EXIT_FLAG = True
                 continue
+        
+        if EXIT_FLAG == True:
+            message.error("variable filejson: not found in source code")
+            exit(1)
+
 
     # product info
     product = re.search(r"product = ({.*})", apiData)[1]
@@ -68,10 +100,8 @@ def printTable(activeList):
         len_filename.append(len(activeList[i]["name"]))
     max_len_filename = max(len_filename) + 1
 
-    print(
-        Fore.CYAN
-        + f"""\n{"Id":<4}| {"Filename":<{max_len_filename}}| {"Date":<10} | {"Downloads":<10}| {"Size":<8} |"""
-        + Fore.RESET
+    message.title(
+        f"""\n{"Id":<4}| {"Filename":<{max_len_filename}}| {"Date":<10} | {"Downloads":<10}| {"Size":<8} |"""
     )
     print("-" * (4 + max_len_filename + 10 + 10 + 8 + 11))
 
@@ -105,9 +135,9 @@ def log(filename, date, path, url):
         writer.writerow({"FILENAME": filename, "DATE": date, "PATH": path, "PAGE": url})
         print(f"Logs saved at: {logFile}")
         if USER == "root":
-            SUDO_GID = int(os.environ.get('SUDO_GID'))
-            SUDO_UID = int(os.environ.get('SUDO_UID'))
-            os.chown(logFile, SUDO_GID, SUDO_UID )
+            SUDO_GID = int(os.environ.get("SUDO_GID"))
+            SUDO_UID = int(os.environ.get("SUDO_UID"))
+            os.chown(logFile, SUDO_GID, SUDO_UID)
     csv_log.close()
 
 
@@ -135,7 +165,7 @@ def listDir(path):
         for dir in os.listdir(path):
             print(Fore.LIGHTGREEN_EX + dir + Fore.RESET)
     else:
-        print(Fore.RED + "Error: Given path is not a directory" + Fore.RESET)
+        message.error("Given path is not a directory")
         return False
 
 
@@ -147,7 +177,7 @@ def rmDir(themeName):
             shutil.rmtree(p + f"/{themeName}")
             print(f"Removed: {themeName}")
             return True
-    print(Fore.RED + "Theme not found" + Fore.RESET)
+    message.error("Theme not found")
     return False
 
 
@@ -197,7 +227,7 @@ def interact():
         elif args.ls == "icon":
             path = theme_path("icons")
         else:
-            print(Fore.RED + "Invalid argument" + Fore.RESET)
+            message.error("Invalid argument")
             exit()
         listDir(path)
 
@@ -219,7 +249,7 @@ def main(url):
 
     # is valid url input ?
     if "https://www.gnome-look.org/" not in url and "https://www.pling.com/" not in url:
-        print(Fore.RED + "Invalid URL." + Fore.RESET)
+        message.error("Invalid URL.")
         return False
 
     product, looksData = scrapGnomeLooks(url)
@@ -233,7 +263,7 @@ def main(url):
     elif product["cat_title"] == "Cursors":
         path = theme_path("icons")
     else:
-        print(Fore.YELLOW + "WARNING: Can't identify product category" + Fore.RESET)
+        message.warning("Can't identify product category")
         path = "."
 
     # create directory of theme path if not present
@@ -281,10 +311,8 @@ def main(url):
         g_id = int(input())
 
         if g_id > len(looksData) - 1:
-            print(
-                Fore.RED
-                + f"Error: Id out of range, enter a valid Id\nRange of Id is between 0-{len(looksData)-1}"
-                + Fore.RESET
+            message.error(
+                f"Id out of range, enter a valid Id\nRange of Id is between 0-{len(looksData)-1}"
             )
             return False
         else:
@@ -315,7 +343,7 @@ def main(url):
                 tar.write(file.content)
             print(f"""Downloaded: {themeFile} at {temp_dir}""")
         else:
-            print(f"Error: status_code {file.status_code}")
+            message.error("status_code {file.status_code}")
             exit()
 
     download(g_id)
@@ -328,13 +356,13 @@ def main(url):
         log(themeFile, looksData[g_id]["updated_timestamp"], path, url)
 
     else:
-        print("Error: Not a tar file.")
+        message.error("Not a tar file.")
         return False
 
-    print(
-        Fore.GREEN
-        + "\nAll set, Theme has been installed\nHere is where you can see your installed theme"
+    message.sucesses(
+        "\nAll set, Theme has been installed\nHere is where you can see your installed theme"
     )
+
     print(
         Fore.LIGHTMAGENTA_EX
         + "Open: gnome-tweaks > Appearance > Applications"
