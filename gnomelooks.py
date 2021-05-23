@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import re
+from bs4.builder import FAST
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
@@ -328,9 +329,22 @@ def main(url):
 
     print("Gnome-looks Theme-Downloader")
 
-    # is valid url input ?
-    if "https://www.gnome-look.org/" not in url and "https://www.pling.com/" not in url:
-        message.error("Invalid URL.", stop_here=True)
+    v = [
+        "www.opendesktop.org/",
+        "www.pling.com/",
+        "store.kde.org/",
+        "www.gnome-look.org/",
+        "www.xfce-look.org/",
+    ]
+    is_valid = False
+
+    for u in v:
+        if u in url:
+            is_valid = True
+            break
+    
+    if is_valid == False:
+        message.error("Invalid url.", stop_here=True)
         return False
 
     product, looksData = scrapGnomeLooks(url)
