@@ -15,7 +15,7 @@ fi
 function _test_requirement_packages
 {
     echo -e "Checking if needed packages exist.\n"
-    local needed=("curl" "git" "python3" "pip3" "curl" "gnome-tweaks")
+    local needed=("curl" "git" "python3" "pip3" "curl")
     
     for p in ${needed[@]};do
         if ! [[ `command -v "$p"` ]];then
