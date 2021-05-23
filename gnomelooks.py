@@ -9,17 +9,15 @@ import os, subprocess, shutil
 import argparse
 from colorama import Fore
 
-USER = os.environ.get("USER")
-SUDO_USER = os.environ.get("SUDO_USER")
-HOME = (SUDO_USER and f"/home/{SUDO_USER}") or os.environ.get("HOME")
-
 
 class Message:
     def __init__(self):
         pass
 
-    def error(self, message: str):
+    def error(self, message: str, stop_here=False):
         print(Fore.RED + "ERROR: " + message + Fore.RESET)
+        if stop_here == True:
+            exit(1)
 
     def sucesses(self, message: str):
         print(Fore.GREEN + message + Fore.RESET)
@@ -34,14 +32,33 @@ class Message:
         print(Fore.LIGHTCYAN_EX + message + Fore.RESET)
 
 
+def check_desktop_environment():
+
+    if os.path.exists("/proc/sched_debug"):
+        with open("/proc/sched_debug", "r") as sched:
+            ps = sched.read()
+
+        if "gnome-shell" in ps:
+            return "gnome"
+        elif "plasmashell" in ps:
+            return "kde"
+        elif "xfce4-session" in ps:
+            return "xfce"
+
+
 message = Message()
+
+USER = os.environ.get("USER")
+SUDO_USER = os.environ.get("SUDO_USER")
+HOME = (SUDO_USER and f"/home/{SUDO_USER}") or os.environ.get("HOME")
+DESKTOP_SESSION = check_desktop_environment()
 
 
 def scrapGnomeLooks(url):
 
     gnome_looks_page = requests.get(url)
     if gnome_looks_page.status_code == 404:
-        message.error("Page responded 404 (File not found)")
+        message.error("Page responded 404 (File not found)", stop_here=True)
         exit()
 
     soup = BeautifulSoup(gnome_looks_page.text, "lxml")
@@ -50,7 +67,7 @@ def scrapGnomeLooks(url):
     try:
         apiData = soup.select_one("#od-body > script:nth-child(20)").string
         re.search(r"filesJson = ", apiData)
-    
+
     except TypeError:
         EXIT_FLAG = False
         # if api-json is not present at jspath, bruteforce for jspath
@@ -66,11 +83,10 @@ def scrapGnomeLooks(url):
             except:
                 EXIT_FLAG = True
                 continue
-        
+
         if EXIT_FLAG == True:
             message.error("variable filejson: not found in source code")
             exit(1)
-
 
     # product info
     product = re.search(r"product = ({.*})", apiData)[1]
@@ -150,12 +166,68 @@ def tarExtract(filename, directory):
     command = f"tar -xf {filename} --directory {directory}"
     subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 
-
+# theme/icon paths for different desktop env
 def theme_path(arg):
-    # themes
-    # icons
-    path = (USER == "root" and f"/usr/share/{arg}") or f"{HOME}/.local/share/{arg}"
-    return path
+
+    # arg = (themes or icons or cursor)
+    desktop_env_paths = {
+        "gnome": {
+            "theme_path": {
+                "local": f"{HOME}/.local/share/themes",
+                "global": f"/usr/share/themes",
+            },
+            "icon_path": {
+                "local": f"{HOME}/.local/share/icons",
+                "global": f"/usr/share/icons",
+            },
+            "cursor_path": {
+                "local": f"{HOME}/.local/share/icons",
+                "global": f"/usr/share/icons",
+            },
+        },
+        "kde": {
+            "theme_path": {
+                "local": f"{HOME}/.local/share/plasma/desktoptheme/",
+                "global": f"/usr/share/plasma/desktoptheme/",
+            },
+            "icon_path": {
+                "local": f"{HOME}/.local/share/icons",
+                "global": f"/usr/share/icons",
+            },
+            "cursor_path": {"local": f"{HOME}/.icons", "global": f"/usr/share/icons",},
+        },
+        "xfce": {
+            "theme_path": {
+                "local": f"${HOME}/.themes",
+                "global": f"/usr/share/themes",
+            },
+            "icon_path": {"local": f"${HOME}/.icons", "global": f"/usr/share/icons",},
+            "cursor_path": {"local": f"${HOME}/.icons", "global": f"/usr/share/icons",},
+        },
+    }
+
+    for types in desktop_env_paths:
+
+        if types in DESKTOP_SESSION:
+
+            d = desktop_env_paths[types]
+
+            if arg == "themes":
+                if USER == "root":
+                    return d["theme_path"]["global"]
+                else:
+                    return d["theme_path"]["local"]
+
+            elif arg == "icons":
+                if USER == "root":
+                    return d["icon_path"]["global"]
+                else:
+                    return d["icon_path"]["local"]
+            elif arg == "cursor":
+                if USER == "root":
+                    return d["cursor_path"]["global"]
+                else:
+                    return d["cursor_path"]["local"]
 
 
 # print dirs
@@ -165,7 +237,7 @@ def listDir(path):
         for dir in os.listdir(path):
             print(Fore.LIGHTGREEN_EX + dir + Fore.RESET)
     else:
-        message.error("Given path is not a directory")
+        message.error("Given path is not a directory", stop_here=True)
         return False
 
 
@@ -177,7 +249,7 @@ def rmDir(themeName):
             shutil.rmtree(p + f"/{themeName}")
             print(f"Removed: {themeName}")
             return True
-    message.error("Theme not found")
+    message.error("Theme not found", stop_here=True)
     return False
 
 
@@ -193,11 +265,19 @@ def interact():
     )
 
     parser._optionals.title = "OPTIONS"
+
     parser.add_argument(
         "-i",
         metavar="[URL]",
         action="store",
         help="Install gnome - GTK/Shell ,Icon, Cursor theme.",
+        type=str,
+    )
+    parser.add_argument(
+        "-update",
+        metavar="[Any string]",
+        action="store",
+        help="Update this tool",
         type=str,
     )
     parser.add_argument(
@@ -227,13 +307,14 @@ def interact():
         elif args.ls == "icon":
             path = theme_path("icons")
         else:
-            message.error("Invalid argument")
-            exit()
+            message.error("Invalid argument", stop_here=True)
         listDir(path)
 
     elif args.rm:
         rmDir(args.rm)
-
+    elif args.update:
+        os.chdir(f"{HOME}/.gnomelooks")
+        os.system("git pull origin master")
     else:
         parser.print_help()
         return False
@@ -249,7 +330,7 @@ def main(url):
 
     # is valid url input ?
     if "https://www.gnome-look.org/" not in url and "https://www.pling.com/" not in url:
-        message.error("Invalid URL.")
+        message.error("Invalid URL.", stop_here=True)
         return False
 
     product, looksData = scrapGnomeLooks(url)
@@ -261,7 +342,7 @@ def main(url):
     elif product["cat_title"] == "Full Icon Themes":
         path = theme_path("icons")
     elif product["cat_title"] == "Cursors":
-        path = theme_path("icons")
+        path = theme_path("cursor")
     else:
         message.warning("Can't identify product category")
         path = "."
@@ -312,7 +393,8 @@ def main(url):
 
         if g_id > len(looksData) - 1:
             message.error(
-                f"Id out of range, enter a valid Id\nRange of Id is between 0-{len(looksData)-1}"
+                f"Id out of range, enter a valid Id\nRange of Id is between 0-{len(looksData)-1}",
+                stop_here=True,
             )
             return False
         else:
@@ -343,7 +425,7 @@ def main(url):
                 tar.write(file.content)
             print(f"""Downloaded: {themeFile} at {temp_dir}""")
         else:
-            message.error("status_code {file.status_code}")
+            message.error("status_code {file.status_code}", stop_here=True)
             exit()
 
     download(g_id)
@@ -356,7 +438,7 @@ def main(url):
         log(themeFile, looksData[g_id]["updated_timestamp"], path, url)
 
     else:
-        message.error("Not a tar file.")
+        message.error("Not a tar file.", stop_here=True)
         return False
 
     message.sucesses(
