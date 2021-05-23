@@ -8,7 +8,7 @@
 
 ### Installation
 
-**pre-requisits:** having installed `python3` `curl` `gnome-tweaks` `unzip`
+**pre-requisits:** having installed `python3` `curl` `unzip`
 
     sudo apt install -y python3 python3-pip curl unzip
 
