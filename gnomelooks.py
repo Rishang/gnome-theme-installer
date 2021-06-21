@@ -202,15 +202,15 @@ def theme_path(arg):
         },
         "xfce": {
             "theme_path": {
-                "local": f"${HOME}/.themes",
+                "local": f"{HOME}/.themes",
                 "global": f"/usr/share/themes",
             },
             "icon_path": {
-                "local": f"${HOME}/.icons",
+                "local": f"{HOME}/.icons",
                 "global": f"/usr/share/icons",
             },
             "cursor_path": {
-                "local": f"${HOME}/.icons",
+                "local": f"{HOME}/.icons",
                 "global": f"/usr/share/icons",
             },
         },
