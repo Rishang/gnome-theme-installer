@@ -367,7 +367,7 @@ def main(url):
     elif product["cat_title"] == "Cursors":
         path = theme_path("cursor")
     else:
-        message.warning("Can't identify product category")
+        message.warning("Can't identify product category, using current path.")
         path = "."
 
     # create directory of theme path if not present
@@ -468,11 +468,10 @@ def main(url):
         "\nAll set, Theme has been installed\nHere is where you can see your installed theme"
     )
 
-    print(
-        Fore.LIGHTMAGENTA_EX
-        + "Open: gnome-tweaks > Appearance > Applications"
-        + Fore.RESET
-    )
+    if DESKTOP_SESSION == "gnome":
+        message.sucesses("Open: gnome-tweaks > Appearance > Applications")
+    elif DESKTOP_SESSION in ["kde" , "xfce"]:
+        message.sucesses("Open: settings-manager > Appearance")
 
 
 if __name__ == "__main__":
