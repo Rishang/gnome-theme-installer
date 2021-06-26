@@ -1,15 +1,14 @@
 #! /usr/bin/env python3
 
 import re
-from bs4.builder import FAST
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import unquote
 import json, csv
-import os, subprocess, shutil
+import os, shutil
 import argparse
 from colorama import Fore
-
+import tarfile
 
 class Message:
     def __init__(self):
@@ -27,7 +26,7 @@ class Message:
         print(Fore.YELLOW + "WARNING: " + message + Fore.RESET)
 
     def info(self, message: str):
-        print(Fore.LIGHTMAGENTA_EX + message + Fore.RESET)
+        print(Fore.LIGHTMAGENTA_EX + "INFO: " + message + Fore.RESET)
 
     def title(self, message: str):
         print(Fore.LIGHTCYAN_EX + message + Fore.RESET)
@@ -157,15 +156,6 @@ def log(filename, date, path, url):
             os.chown(logFile, SUDO_GID, SUDO_UID)
     csv_log.close()
 
-
-# extract tar files
-def tarExtract(filename, directory):
-
-    if os.path.isdir(directory) is False:
-        os.makedirs(directory)
-
-    command = f"tar -xf {filename} --directory {directory}"
-    subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 
 # theme/icon paths for different desktop env
 def theme_path(arg):
@@ -360,7 +350,9 @@ def main(url):
 
     # detect install path
 
-    if product["cat_title"] == "GTK3/4 Themes":
+    if os.environ.get("TEST_THEME_INSTALLER") == 'true':
+        path = "./" + product["cat_title"]
+    elif product["cat_title"] == "GTK3/4 Themes":
         path = theme_path("themes")
     elif product["cat_title"] == "Full Icon Themes":
         path = theme_path("icons")
@@ -371,7 +363,6 @@ def main(url):
         path = "."
 
     # create directory of theme path if not present
-
     if os.path.isdir(path) is False:
         os.makedirs(path)
 
@@ -412,23 +403,14 @@ def main(url):
     # Get / check valid input
     try:
         # g_id is custom id of gnome theme/icon
-        g_id = int(input())
-
-        if g_id > len(looksData) - 1:
-            message.error(
-                f"Id out of range, enter a valid Id\nRange of Id is between 0-{len(looksData)-1}",
-                stop_here=True,
-            )
-            return False
-        else:
-            themeFile = looksData[g_id]["name"]
+        g_ids = str(input())
 
     except ValueError:
-        print("Enter Id , of integer type")
+        print("Enter valid Id")
         exit()
 
     # download to temp_dir
-    def download(g_id):
+    def download(id, fileName):
 
         # create temp dir where tar files will be downloaded
         try:
@@ -436,37 +418,43 @@ def main(url):
         except FileExistsError:
             pass
 
-        themeUrl = unquote(looksData[g_id]["url"])
+        themeUrl = unquote(looksData[id]["url"])
 
-        print(f"Downloading {looksData[g_id]['name']} ....")
+        message.info(f"Downloading {looksData[id]['name']} ....")
         file = requests.get(themeUrl)
 
         # download file through downloadlink,
         # and exit() if server status code other than 200.
         if file.status_code == 200:
-            with open(f"{temp_dir}/{themeFile}", "wb") as tar:
+            with open(f"{temp_dir}/{fileName}", "wb") as tar:
                 tar.write(file.content)
-            print(f"""Downloaded: {themeFile} at {temp_dir}""")
+            message.info(f"""Downloaded: {fileName} at {temp_dir}""")
         else:
             message.error("status_code {file.status_code}", stop_here=True)
             exit()
 
-    download(g_id)
+    def extract_theme(themeFile):
+        # Extract ".tar" file to path, after download sucesses
+        if ".tar" in themeFile:
+            with tarfile.open(f"{temp_dir}/{themeFile}") as tar:
+                tar.extractall(path=path)
 
-    # Extract ".tar" file to path, after download sucesses
-    if ".tar" in themeFile:
-        tarExtract(f"{temp_dir}/{themeFile}", path)
-        print(f"""Extracted {themeFile}, at {path}""")
+                message.sucesses(f"""Extracted {themeFile}, at {path}""")
+                log(themeFile, looksData[g_id]["updated_timestamp"], path, url)
 
-        log(themeFile, looksData[g_id]["updated_timestamp"], path, url)
+        else:
+            message.error("Not a tar file.", stop_here=True)
+            return False
+    
+    for g_id in g_ids.split(","):
+        g_id = int(g_id)
+        themeFile = looksData[g_id]["name"]
+        download(id=g_id, fileName=themeFile)
+        extract_theme(themeFile)
 
-    else:
-        message.error("Not a tar file.", stop_here=True)
-        return False
 
-    message.sucesses(
-        "\nAll set, Theme has been installed\nHere is where you can see your installed theme"
-    )
+    message.info("All set, Theme has been installed")
+    print("Here is where you can see your installed theme")
 
     if DESKTOP_SESSION == "gnome":
         message.sucesses("Open: gnome-tweaks > Appearance > Applications")
