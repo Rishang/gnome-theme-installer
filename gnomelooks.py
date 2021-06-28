@@ -10,6 +10,7 @@ import argparse
 from colorama import Fore
 import tarfile
 
+
 class Message:
     def __init__(self):
         pass
@@ -129,7 +130,21 @@ def printTable(activeList):
         sizeMB = round(int(activeList[i]["size"]) / 1000000, 3)
 
         print(
-            f"""{i:<4}| {filename:<{max_len_filename}}| {updated_timestamp:<10} | {downloaded_count:<10}| {sizeMB:<6}MB |"""
+            Fore.LIGHTRED_EX
+            + f"{i:<4}"
+            + "| "
+            + Fore.GREEN
+            + f"{filename:<{max_len_filename}}"
+            + "| "
+            + Fore.CYAN
+            + f"{updated_timestamp:<10}"
+            + " | "
+            + Fore.YELLOW
+            + f"{downloaded_count:<10}"
+            + "| "
+            + Fore.MAGENTA
+            + f"{sizeMB:<6}MB"
+            + " |"
         )
 
     print("-" * (4 + max_len_filename + 10 + 10 + 8 + 11))
@@ -341,7 +356,7 @@ def main(url):
         if u in url:
             is_valid = True
             break
-    
+
     if is_valid == False:
         message.error("Invalid url.", stop_here=True)
         return False
@@ -350,7 +365,7 @@ def main(url):
 
     # detect install path
 
-    if os.environ.get("TEST_THEME_INSTALLER") == 'true':
+    if os.environ.get("TEST_THEME_INSTALLER") == "true":
         path = "./" + product["cat_title"]
     elif product["cat_title"] == "GTK3/4 Themes":
         path = theme_path("themes")
@@ -445,20 +460,19 @@ def main(url):
         else:
             message.error("Not a tar file.", stop_here=True)
             return False
-    
+
     for g_id in g_ids.split(","):
         g_id = int(g_id)
         themeFile = looksData[g_id]["name"]
         download(id=g_id, fileName=themeFile)
         extract_theme(themeFile)
 
-
     message.info("All set, Theme has been installed")
     print("Here is where you can see your installed theme")
 
     if DESKTOP_SESSION == "gnome":
         message.sucesses("Open: gnome-tweaks > Appearance > Applications")
-    elif DESKTOP_SESSION in ["kde" , "xfce"]:
+    elif DESKTOP_SESSION in ["kde", "xfce"]:
         message.sucesses("Open: settings-manager > Appearance")
 
 
