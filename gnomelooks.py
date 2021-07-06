@@ -33,21 +33,40 @@ class Message:
         print(Fore.LIGHTCYAN_EX + message + Fore.RESET)
 
 
+message = Message()
+
+
 def check_desktop_environment():
 
+    desk_env = {1: "gnome", 2: "kde", 3: "xfce"}
+
+    # read /proc/sched_debug
     if os.path.exists("/proc/sched_debug"):
         with open("/proc/sched_debug", "r") as sched:
             ps = sched.read()
 
         if "gnome-shell" in ps:
-            return "gnome"
+            return desk_env[1]
         elif "plasmashell" in ps:
-            return "kde"
+            return desk_env[2]
         elif "xfce4-session" in ps:
-            return "xfce"
+            return desk_env[3]
+    else:
+        message.error("Can't figureout desktop environment")
+        message.title("Which one is your desktop environment \n")
 
+        print("id| Name")
+        print("--+-------")
+        for e in desk_env:
+            print(f" {e}| {desk_env[e].capitalize()}")
 
-message = Message()
+        print("\nEnter id for your desktop environment: ", end="")
+        ans = int(input())
+        if ans >= len(desk_env):
+            return desk_env[ans]
+        else:
+            exit(1)
+
 
 USER = os.environ.get("USER")
 SUDO_USER = os.environ.get("SUDO_USER")
