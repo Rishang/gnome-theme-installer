@@ -5,3 +5,4 @@ env/
 .ipynb_checkpoints
 *.code-workspace
 *.csv
+themes

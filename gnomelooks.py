@@ -9,6 +9,7 @@ import os, shutil
 import argparse
 from colorama import Fore
 import tarfile
+import base64
 
 
 class Message:
@@ -73,10 +74,13 @@ SUDO_USER = os.environ.get("SUDO_USER")
 HOME = (SUDO_USER and f"/home/{SUDO_USER}") or os.environ.get("HOME")
 DESKTOP_SESSION = check_desktop_environment()
 
+# gitignore "./themes"
+SET_PATH = False
 
 def scrapGnomeLooks(url):
 
     gnome_looks_page = requests.get(url)
+
     if gnome_looks_page.status_code == 404:
         message.error("Page responded 404 (File not found)", stop_here=True)
         exit()
@@ -84,9 +88,12 @@ def scrapGnomeLooks(url):
     soup = BeautifulSoup(gnome_looks_page.text, "lxml")
 
     # where a variable contain json data of theme-files
+
+    # product details
+    pattern = r"productViewDataEncoded = '(ey.+)';var categoryId"
     try:
-        apiData = soup.select_one("#od-body > script:nth-child(20)").string
-        re.search(r"filesJson = ", apiData)
+        productData = soup.select_one("#od-body > script:nth-child(11)").string
+        p = re.search(pattern, productData)[1]
 
     except TypeError:
         EXIT_FLAG = False
@@ -94,10 +101,13 @@ def scrapGnomeLooks(url):
         script_child = [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
         for blind_id in script_child:
             try:
-                apiData = soup.select_one(
+                productData = soup.select_one(
                     f"#od-body > script:nth-child({blind_id})"
                 ).string
-                if re.search(r"filesJson = \[", apiData):
+                p = re.search(pattern, productData)[1]
+                p = base64.decode(p)
+
+                if re.search(pattern, productData):
                     EXIT_FLAG = False
                     break
             except:
@@ -105,14 +115,22 @@ def scrapGnomeLooks(url):
                 continue
 
         if EXIT_FLAG == True:
-            message.error("variable filejson: not found in source code")
+            message.error("variable productViewDataEncoded: not found in source code")
             exit(1)
 
-    # product info
-    product = re.search(r"product = ({.*})", apiData)[1]
+    p = base64.b64decode(p).decode("utf-8")
+    p = json.loads(p)
 
-    # collect filesJson -> list having json data in it
-    filesJson = re.search(r"filesJson = (\[.*\])", apiData)[1]
+    product = {
+        "title": p["product"]["title"],
+        "cat_title": p["product"]["cat_title"],
+        "count_likes": p["tabCnt"]["cntLikes"],
+        "username": p["product"]["username"],
+        "description": p["product"]["description"],
+    }
+
+    # theme file
+    filesJson = requests.get(url + "/loadFiles").text
 
     # collect active files and ignore archived ones.
     def collect_active(jsonList):
@@ -123,7 +141,7 @@ def scrapGnomeLooks(url):
                 active.append(jsonList[i])
         return active
 
-    return json.loads(product), collect_active(json.loads(filesJson))
+    return product, collect_active(json.loads(filesJson))
 
 
 # print scraped data in form of tables
@@ -144,9 +162,9 @@ def printTable(activeList):
     for i in range(len(activeList)):
 
         filename = activeList[i]["name"]
-        updated_timestamp = activeList[i]["updated_timestamp"][:10]
-        downloaded_count = activeList[i]["downloaded_count"]
-        sizeMB = round(int(activeList[i]["size"]) / 1000000, 3)
+        updated_timestamp = activeList[i]["created_timestamp"][:10]
+        downloaded_count = activeList[i].get("downloaded_count_uk")
+        sizeMB = round(int(activeList[i].get("size")) / 1000000, 3)
 
         print(
             Fore.LIGHTRED_EX
@@ -195,6 +213,8 @@ def log(filename, date, path, url):
 def theme_path(arg):
 
     # arg = (themes or icons or cursor)
+    if SET_PATH:
+        return SET_PATH
     desktop_env_paths = {
         "gnome": {
             "theme_path": {
@@ -414,13 +434,16 @@ def main(url):
         + Fore.RESET
     )
 
-    # product description
+    # temp disabled
+    """
+    product description
     description = re.sub(
         r"\[\/?b|B\]|\[\/?url\]|\[\/?color.+\]|\[\/?code\]|\[\/?|\]",
         "",
         product["description"],
     )
     print(Fore.CYAN + "Description\n" + Fore.RESET + description)
+    """
 
     # product category
     print(Fore.YELLOW + f"\nCategory: {product['cat_title']}" + Fore.RESET)
