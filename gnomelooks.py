@@ -74,9 +74,6 @@ SUDO_USER = os.environ.get("SUDO_USER")
 HOME = (SUDO_USER and f"/home/{SUDO_USER}") or os.environ.get("HOME")
 DESKTOP_SESSION = check_desktop_environment()
 
-# gitignore "./themes"
-SET_PATH = False
-
 
 def scrapGnomeLooks(url):
 
@@ -212,8 +209,6 @@ def log(filename, date, path, url):
 def theme_path(arg):
 
     # arg = (themes or icons or cursor)
-    if SET_PATH:
-        return SET_PATH
     desktop_env_paths = {
         "gnome": {
             "theme_path": {
