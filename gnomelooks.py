@@ -77,6 +77,7 @@ DESKTOP_SESSION = check_desktop_environment()
 # gitignore "./themes"
 SET_PATH = False
 
+
 def scrapGnomeLooks(url):
 
     gnome_looks_page = requests.get(url)
@@ -148,11 +149,9 @@ def scrapGnomeLooks(url):
 def printTable(activeList):
 
     # get max_len_filename, to calc the area needed to printTable()
-    len_filename = []
-
-    for i in range(len(activeList)):
-        len_filename.append(len(activeList[i]["name"]))
-    max_len_filename = max(len_filename) + 1
+    max_len_filename = (
+        len(max([activeList[i]["name"] for i in range(len(activeList))], key=len)) + 1
+    )
 
     message.title(
         f"""\n{"Id":<4}| {"Filename":<{max_len_filename}}| {"Date":<10} | {"Downloads":<10}| {"Size":<8} |"""
