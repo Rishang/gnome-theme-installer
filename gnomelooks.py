@@ -42,15 +42,15 @@ def check_desktop_environment():
     desk_env = {1: "gnome", 2: "kde", 3: "xfce"}
 
     # read /proc/sched_debug
-    if os.path.exists("/proc/sched_debug"):
-        with open("/proc/sched_debug", "r") as sched:
-            ps = sched.read()
+    if os.environ.get("XDG_CURRENT_DESKTOP"):
 
-        if "gnome-shell" in ps:
+        ps = f'{os.environ.get("XDG_CURRENT_DESKTOP")}'.lower()
+
+        if "gnome" in ps:
             return desk_env[1]
-        elif "plasmashell" in ps:
+        elif ["plasma","kde"] in ps:
             return desk_env[2]
-        elif "xfce4-session" in ps:
+        elif "xfce" in ps:
             return desk_env[3]
     else:
         message.error("Can't figureout desktop environment")
