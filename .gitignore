@@ -6,3 +6,4 @@ env/
 *.code-workspace
 *.csv
 themes
+GTK*

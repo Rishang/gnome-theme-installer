@@ -63,7 +63,7 @@ def check_desktop_environment():
 
         print("\nEnter id for your desktop environment: ", end="")
         ans = int(input())
-        if ans >= len(desk_env):
+        if ans <= len(desk_env):
             return desk_env[ans]
         else:
             exit(1)
@@ -470,7 +470,7 @@ def main(url):
             pass
 
         themeUrl = unquote(looksData[id]["url"])
-
+        print(themeUrl)
         message.info(f"Downloading {looksData[id]['name']} ....")
         file = requests.get(themeUrl)
 
