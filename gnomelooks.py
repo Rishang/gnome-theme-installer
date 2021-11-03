@@ -42,13 +42,13 @@ def check_desktop_environment():
     desk_env = {1: "gnome", 2: "kde", 3: "xfce"}
 
     # read /proc/sched_debug
-    if os.environ.get("XDG_CURRENT_DESKTOP"):
-
-        ps = f'{os.environ.get("XDG_CURRENT_DESKTOP")}'.lower()
+    XDG_DESK = os.environ.get("XDG_CURRENT_DESKTOP") or os.environ.get('ORIGINAL_XDG_CURRENT_DESKTOP')
+    if XDG_DESK:
+        ps = f'{XDG_DESK}'.lower()
 
         if "gnome" in ps:
             return desk_env[1]
-        elif ["plasma","kde"] in ps:
+        elif "plasma" in ps or "kde" in ps:
             return desk_env[2]
         elif "xfce" in ps:
             return desk_env[3]
