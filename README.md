@@ -22,6 +22,10 @@ To Install themes for current user `gnomelooks -i [URL]`
 
 To Install themes globally `sudo gnomelooks -i [URL]`
 
+## update gnomelooks
+
+run: `gnomelooks -update me`
+
 ## gnomelooks help Page
 
     ~$  gnomelooks -h
