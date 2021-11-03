@@ -33,11 +33,13 @@ run: `gnomelooks -update me`
 
         Example: gnomelooks -i 'https://www.gnome-look.org/p/1253385/'
 
-        Gnome Theme Downloader - This script downloads - Icon, Shell and Cursor themes form https://www.gnome-look.org/, and automatically installs it, Just visit "https://www.gnome-look.org/" copy the url of the theme you
-        want to install like the following example above showing, installing - Sweet theme.
+        Gnome Theme Downloader - This script downloads - Icon, Shell and Cursor themes form https://www.gnome-look.org/, and
+        automatically installs it, Just visit "https://www.gnome-look.org/" copy the url of the theme you want to install like
+        the following example above showing, installing - Sweet theme.
 
         OPTIONS:
-        -h, --help        show this help message and exit
-        -i [URL]          Install gnome - GTK/Shell ,Icon, Cursor theme.
-        -ls [gtk | icon]  List installed themes
-        -rm [theme name]  Remove any installed themes
+        -h, --help            show this help message and exit
+        -i [URL]              Install gnome - GTK/Shell ,Icon, Cursor theme.
+        -update [Any string]  Update this tool
+        -ls [gtk | icon]      list installed themes
+        -rm theme name        remove any installed themes
