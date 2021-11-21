@@ -6,25 +6,11 @@
 
 ![image 2](https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/.github/images/2.png)
 
-### Installation
-
-**pre-requisits:** having installed `python3` `curl` `unzip`
-
-    sudo apt install -y python3 python3-pip curl unzip
-
-**Install `gnomelooks` script**
-
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/install.sh)"
-
 ## gnomelooks
 
 To Install themes for current user `gnomelooks -i [URL]`
 
 To Install themes globally `sudo gnomelooks -i [URL]`
-
-## update gnomelooks
-
-run: `gnomelooks -update me`
 
 ## gnomelooks help Page
 
@@ -43,3 +29,17 @@ run: `gnomelooks -update me`
         -update [Any string]  Update this tool
         -ls [gtk | icon]      list installed themes
         -rm theme name        remove any installed themes
+
+### Installation
+
+**pre-requisits:** having installed `python3` `curl` `unzip`
+
+    sudo apt install -y python3 python3-pip curl unzip
+
+**Install `gnomelooks` script**
+
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/install.sh)"
+
+## update gnomelooks
+
+run: `gnomelooks -update me`
