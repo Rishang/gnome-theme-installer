@@ -128,18 +128,15 @@ def scrapGnomeLooks(url):
     }
 
     # theme file
-    filesJson = requests.get(url + "/loadFiles").text
+    filesJson = json.loads(requests.get(url + "/loadFiles").text)
 
     # collect active files and ignore archived ones.
-    def collect_active(jsonList):
+    active = []
+    for f in filesJson:
+        if f["active"] == "1":
+            active.append(f)
 
-        active = []
-        for i in range(len(jsonList)):
-            if jsonList[i]["active"] == "1":
-                active.append(jsonList[i])
-        return active
-
-    return product, collect_active(json.loads(filesJson))
+    return product, active
 
 
 # print scraped data in form of tables
@@ -383,14 +380,8 @@ def main(url):
         "www.gnome-look.org/",
         "www.xfce-look.org/",
     ]
-    is_valid = False
 
-    for u in v:
-        if u in url:
-            is_valid = True
-            break
-
-    if is_valid == False:
+    if not any(u in url for u in v):
         message.error("Invalid url.", stop_here=True)
         return False
 
@@ -470,7 +461,7 @@ def main(url):
             pass
 
         themeUrl = unquote(looksData[id]["url"])
-        print(themeUrl)
+        # print(themeUrl)
         message.info(f"Downloading {looksData[id]['name']} ....")
         file = requests.get(themeUrl)
 
