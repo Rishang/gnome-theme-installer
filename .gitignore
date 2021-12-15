@@ -7,3 +7,7 @@ env/
 *.csv
 themes
 GTK*
+__pycache__
+state.json
+dist
+poetry.lock
