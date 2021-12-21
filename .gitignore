@@ -1,0 +1,14 @@
+.vscode/
+env/
+.temp/
+**tmp**
+.ipynb_checkpoints
+*.code-workspace
+*.csv
+themes
+GTK*
+__pycache__
+state.json
+dist
+poetry.lock
+.pipenv
