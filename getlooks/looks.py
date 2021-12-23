@@ -146,7 +146,7 @@ def looks_log(product: ProductInfo):
     state.save()
 
 
-def looks_install(url, p_ids: List[str]) -> ProductInfo:
+def looks_install(url, p_ids: List[str]=[]) -> ProductInfo:
 
     """
     valid list for theme download
