@@ -69,8 +69,10 @@ def state_update_rm(removed_items: List[str]):
                         product.files.remove(_f)
                     else:
                         _f.extracted_files.remove(file_name)
-
-    state.cache = dataclasses.asdict(products)
+    # update state
+    for _id in products:
+        state.cache[_id] = dataclasses.asdict(products[_id])
+    
     state.save()
     return state
 
