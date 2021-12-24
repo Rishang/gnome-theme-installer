@@ -32,7 +32,7 @@ To Install themes globally `sudo gnomelooks -i [URL]`
 
 ### Installation
 
-    pip3 install https://github.com/Rishang/gnome-theme-installer/archive/refs/heads/master.zip
+    pip3 install -U gnomelooks
 
 ## update gnomelooks
 

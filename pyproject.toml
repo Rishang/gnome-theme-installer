@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "getlooks"
+name = "gnomelooks"
 version = "0.1.0"
 description = ""
 authors = ["Rishang <rishangbhavsarcs@gmail.com>"]
