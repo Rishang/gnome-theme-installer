@@ -203,10 +203,12 @@ def download(url: str, at: str):
 def dn_n_extract(url: str, at: str) -> list:
     """Download `url` and extract `at` path."""
 
-    temp = TemporaryDirectory(prefix="looks_", suffix="")
+    temp = TemporaryDirectory(prefix="looks_ex_", suffix="")
+    temp_dn = TemporaryDirectory(prefix="looks_dn_", suffix="")
+    
     # Download
     message.info(f"Downloading... \n")
-    dp = download(url, at="/tmp")
+    dp = download(url, at=temp_dn.name)
 
     # extract at tmp, and list folders
     extract(dp, temp.name)
@@ -218,6 +220,8 @@ def dn_n_extract(url: str, at: str) -> list:
             shutil.rmtree(at_f)
         shutil.move(os.path.join(temp.name, f), at_f)
         print(f"Moved to: {at_f}")
+    
+    temp_dn.cleanup()
     temp.cleanup()
     return extracted_items
 
