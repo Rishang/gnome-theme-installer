@@ -154,17 +154,21 @@ def ls(path: str, only_dir: bool = False, include_path: bool = False) -> list:
         raise Exception(f"Path: {path} not found")
     if only_dir:
         if include_path:
-            return [
+            p_ls = [
                 path + f"/{file}"
                 for file in os.listdir(path)
                 if os.path.isdir(path + f"/{file}")
             ]
-        return [file for file in os.listdir(path) if os.path.isdir(path + f"/{file}")]
+        else:
+            p_ls = [file for file in os.listdir(path) if os.path.isdir(path + f"/{file}")]
     else:
         if include_path:
-            return [path + f"/{file}" for file in os.listdir(path)]
-        return os.listdir(path)
-
+            p_ls = [path + f"/{file}" for file in os.listdir(path)]
+        else:
+            p_ls = os.listdir(path)
+    
+    p_ls.sort()
+    return p_ls
 
 def extract(path: str, at: str):
     """Extract tar file"""
