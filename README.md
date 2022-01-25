@@ -2,6 +2,12 @@
 
 ## A cli-tool to download & install gnome based Icons, GTK, Cursor themes easily
 
+## Supported desktop environments
+
+- **Gnone**
+- **Xfce**
+- **KDE Plasma**
+
 ![image 1](https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/.github/images/get.png)
 
 ## gnomelooks
