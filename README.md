@@ -2,7 +2,7 @@
 
 ## A cli-tool to download & install gnome based Icons, GTK, Cursor themes easily
 
-## Supported desktop environments
+### Supported desktop environments
 
 - **Gnone**
 - **Xfce**
