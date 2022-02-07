@@ -188,7 +188,7 @@ def extract(path: str, at: str):
 def download(url: str, at: str):
     """"""
 
-    file = requests.get(url)
+    file = requests.get(url, stream=True)
 
     if not os.path.exists(at):
         os.makedirs(at)
