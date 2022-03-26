@@ -34,7 +34,7 @@ class FileInfo:
     size: str
     downloads: int
     changed_at: str
-    extracted_files: Optional[List[str]] = field(default_factory=list)
+    extracted_files: Optional[List[str]] = field(default_factory=list[str])
 
     def __post_init__(self):
         if isinstance(self.url, str):
