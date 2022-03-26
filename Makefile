@@ -4,9 +4,9 @@ URL="https://www.gnome-look.org/s/Gnome/p/1253385/"
 export TEST_THEME_INSTALLER=true
 
 run:
-	cd looks-install
+	cd getlooks
 	python3 cli.py get ${URL}
 
 sudo_run:
-	cd looks-install
+	cd getlooks
 	sudo python3 cli.py get ${URL}
