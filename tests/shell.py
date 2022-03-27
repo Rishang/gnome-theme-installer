@@ -69,6 +69,6 @@ class Shell:
         return ShellOutputs(stdout=stdout, stderr=stderr, returncode=returncode)
 
 
-def sh(command: str, sudo: bool = False) -> ShellOutputs:
+def sh(command: str) -> ShellOutputs:
     s = Shell()
     return s.cmd(command)
