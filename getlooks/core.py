@@ -228,7 +228,7 @@ def scrapGnomeLooks(url):
 
     system_tags = [t["tag_name"] for t in p_info["systemTags"]]
 
-    for _f in f_info:
+    for _f in f_info["files"]:
         __t = {
             "id": f"{count}",
             # "g_id": _f["id"],
