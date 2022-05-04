@@ -1,9 +1,11 @@
 #! /usr/bin/python3
 
 import os
+import stat
 import json
 import random
 import tarfile
+from zipfile import ZipFile
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -170,6 +172,19 @@ def ls(path: str, only_dir: bool = False, include_path: bool = False) -> list:
     p_ls.sort()
     return p_ls
 
+
+def extract_zip(zf, info, extract_dir):
+    #  Keeping permissions and symlinks intact
+	out_path = os.path.join(extract_dir, info.filename)
+	perm = info.external_attr >> 16	
+	if (stat.S_ISLNK(perm)):
+		src = zf.open(info).read()
+		dst = out_path
+		os.symlink(src, dst)
+	else:
+		zf.extract(info, extract_dir)
+		os.chmod(out_path, perm)
+
 def extract(path: str, at: str):
     """Extract tar file"""
 
@@ -178,6 +193,12 @@ def extract(path: str, at: str):
             if not os.path.exists(at):
                 os.makedirs(at)
             tar.extractall(path=at)
+            message.sucesses(f"""Extracted {path}, at {at}""")
+            return True
+    elif ".zip" in path:
+        with ZipFile(path, 'r') as zip:
+            for info in zip.infolist():
+                extract_zip(zip, info, at)
             message.sucesses(f"""Extracted {path}, at {at}""")
             return True
     else:
