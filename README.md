@@ -1,6 +1,6 @@
 # Gnome-looks themes cli downloader
 
-**A cli-tool to download & install gnome based Icons, GTK, Cursor themes easily**
+**A cli-tool to download, install and update gnome based Icons, GTK, Cursor themes easily**
 
 ### Supported desktop environments
 
