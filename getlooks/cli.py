@@ -57,9 +57,9 @@ def update(
     """
 
     if me:
-        git_pull()
+        os.system("pip install -U gnomelooks")
     elif themes:
-        looks_update("themes")
+        looks_update()
     else:
         see_help("update")
 
@@ -99,10 +99,16 @@ def ls(
     """
 
     print()
+    _look_list = looks_list(themes=themes, icons=icons)[0]
+
     if themes:
-        print_table([{"Theme names": i} for i in looks_list(themes=True)])
+        print_table(
+            [{"id": i, "Theme names": _look_list[i]} for i in range(len(_look_list))]
+        )
     elif icons:
-        print_table([{"Icon names": i} for i in looks_list(icons=True)])
+        print_table(
+            [{"id": i, "Icon names": _look_list[i]} for i in range(len(_look_list))]
+        )
     else:
         see_help("ls")
     print()

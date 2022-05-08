@@ -8,6 +8,7 @@ import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import AnyStr, List, Dict
+import logging
 
 # pipi
 import requests
@@ -17,6 +18,34 @@ from colorama import Fore
 
 # -- code --
 this_file_path = Path(os.path.abspath(__file__)).resolve()
+
+
+def _logger(flag: str = "", format: str = ""):
+    if format == "" or format == None:
+        format = "%(levelname)s|%(name)s| %(message)s"
+
+    # message
+    logger = logging.getLogger(__name__)
+
+    if os.environ.get(flag) != None:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.WARNING)
+
+    # create console handler and set level to debug
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    # create formatter
+    # add formatter to ch
+    formatter = logging.Formatter(format)
+    ch.setFormatter(formatter)
+
+    # add ch to logger
+    logger.addHandler(ch)
+    return logger
+
+
+logger = _logger(flag="TEST_THEME_INSTALLER")
 
 
 def git_pull():
@@ -147,7 +176,12 @@ class Message:
 message = Message()
 
 
-def ls(path: str, only_dir: bool = False, include_path: bool = False) -> list:
+def ls(
+    path: str,
+    only_dir: bool = False,
+    include_path: bool = False,
+    ignore_items: list = [],
+) -> list:
     """List files and directories of given path"""
 
     if not os.path.exists(path):
@@ -160,15 +194,22 @@ def ls(path: str, only_dir: bool = False, include_path: bool = False) -> list:
                 if os.path.isdir(path + f"/{file}")
             ]
         else:
-            p_ls = [file for file in os.listdir(path) if os.path.isdir(path + f"/{file}")]
+            p_ls = [
+                file for file in os.listdir(path) if os.path.isdir(path + f"/{file}")
+            ]
     else:
         if include_path:
             p_ls = [path + f"/{file}" for file in os.listdir(path)]
         else:
             p_ls = os.listdir(path)
-    
+
+    for item in ignore_items:
+        if item in p_ls:
+            p_ls.remove(item)
+
     p_ls.sort()
     return p_ls
+
 
 def extract(path: str, at: str):
     """Extract tar file"""
@@ -209,7 +250,7 @@ def dn_n_extract(url: str, at: str) -> list:
 
     temp = TemporaryDirectory(prefix="looks_ex_", suffix="")
     temp_dn = TemporaryDirectory(prefix="looks_dn_", suffix="")
-    
+
     # Download
     message.info(f"Downloading... \n")
     dp = download(url, at=temp_dn.name)
@@ -224,7 +265,7 @@ def dn_n_extract(url: str, at: str) -> list:
             shutil.rmtree(at_f)
         shutil.move(os.path.join(temp.name, f), at_f)
         print(f"Moved to: {at_f}")
-    
+
     temp_dn.cleanup()
     temp.cleanup()
     return extracted_items

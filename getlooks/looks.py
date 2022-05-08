@@ -4,16 +4,19 @@ import dataclasses
 import os
 import shutil
 from typing import List
+from copy import deepcopy
+
 
 # local
 from getlooks.looks_path import STATE_PATH
-from getlooks.utils import JsonState, JsonState, dn_n_extract, print_table, ls
+from getlooks.utils import JsonState, JsonState, dn_n_extract, print_table, logger
 from getlooks.core import (
     ProductInfo,
     DeskEnv,
     scrapGnomeLooks,
     message,
     product_state_cache,
+    path_for,
 )
 
 # -- code --
@@ -24,12 +27,6 @@ if os.environ.get("TEST_THEME_INSTALLER") == "true":
     state_path = f"./test/state.json"
 else:
     state_path = f"{desk.HOME}/{STATE_PATH}-{desk.USER}/state.json"
-
-path_for = {
-    "GTK3/4 Themes": "themes",
-    "Full Icon Themes": "icons",
-    "Cursors": "cursors",
-}
 
 
 def get_path(product: ProductInfo) -> str:
@@ -53,14 +50,17 @@ def state_update_rm(removed_items: List[str]):
     state = JsonState()
 
     state.load(state_path)
-    products = product_state_cache(state.cache)
+    _products = product_state_cache(state.cache)
+    products = deepcopy(_products)
+
     for path in removed_items:
         file_name = path.split("/")[-1]
-        for _id in products:
+        for _id in _products:
             product = products[_id]
             if len(product.files) == 1 and len(product.files[0].extracted_files) == 1:
-                products.pop(_id)
-                continue
+                if file_name in product.files[0].extracted_files:
+                    products.pop(_id)
+                    continue
 
             for _f in product.files:
 
@@ -71,48 +71,64 @@ def state_update_rm(removed_items: List[str]):
                         _f.extracted_files.remove(file_name)
     # update state
     for _id in products:
+        logger.debug(products[_id])
         state.cache[_id] = dataclasses.asdict(products[_id])
-    
+
+    for _id in list(state.cache.keys()):
+        if _id not in products.keys():
+            state.cache.pop(_id)
+
     state.save()
     return state
 
 
-def looks_list(themes: bool = False, icons: bool = False, include_path: bool = False):
-    desk.check_env()
-    if themes:
-        return ls(desk.theme_path("themes"), only_dir=True, include_path=include_path)
-    elif icons:
-        return ls(desk.theme_path("icons"), only_dir=True, include_path=include_path)
+def looks_list(themes: bool = False, icons: bool = False):
+    state = JsonState()
+    state.load(state_path)
+
+    logger.debug(f"state_path: {state_path}")
+
+    products = product_state_cache(state.cache)
+
+    dirs: List[str] = []
+    for p in products:
+        product = products[p]
+        if themes and product.is_theme():
+            dirs += [file for f in product.files for file in f.extracted_files]
+        elif icons and (product.is_icon() or product.is_cursor()):
+            dirs += [file for f in product.files for file in f.extracted_files]
+
+    return (dirs, products)
 
 
 def looks_rm(themes: bool = False, icons: bool = False) -> List[str]:
     """Remove theme folder and update the state"""
+    _look_list, products = looks_list(themes, icons)
 
-    def list_rm(files: list) -> List[str]:
-        if len(files) == 0:
-            print("No themes.")
-            return []
+    if len(_look_list) == 0:
+        return []
+    theme_path = products[list(products.keys())[0]].install_path
 
-        fmt: list = []
-        for f in range(len(files)):
-            fmt.append({"Id": f, "Name": files[f]})
+    print_table(
+        [{"id": i, "Theme names": _look_list[i]} for i in range(len(_look_list))]
+    )
+    print("Enter id, of file to remove")
+    data: list = input().split(",")
 
-        message.green(f"\nList of files at: {'/'.join(files[0].split('/')[:-1])}\n")
+    removed_items = []
+    for f in data:
+        li = _look_list[int(f)]
+        try:
+            item = f"{theme_path}/{li}"
+            logger.debug(f"removing {item}")
+            shutil.rmtree(path=item)
+        except FileNotFoundError:
+            ...
+        logger.debug(li)
+        removed_items.append(li)
 
-        print_table(fmt)
-        print("\nEnter id to remove file: ", end="")
-        inp = input().split(",")
-
-        choice = []
-        for i in inp:
-            f_name = fmt[int(i)]["Name"]
-            shutil.rmtree(f_name)
-            print(f"Removed {f_name}")
-            choice.append(f_name)
-        return choice
-
-    removed_items = list_rm(looks_list(themes=themes, icons=icons, include_path=True))
     # remove item and update state
+    logger.debug(removed_items)
     state_update_rm(removed_items)
 
     return removed_items
@@ -148,7 +164,7 @@ def looks_log(product: ProductInfo):
     state.save()
 
 
-def looks_install(url, p_ids: List[str]=[]) -> ProductInfo:
+def looks_install(url, p_ids: List[str] = []) -> ProductInfo:
 
     """
     valid list for theme download
@@ -200,7 +216,7 @@ def looks_install(url, p_ids: List[str]=[]) -> ProductInfo:
     return product
 
 
-def looks_update(theme_type: str = ""):
+def looks_update():
 
     state = JsonState()
     desk.check_env()

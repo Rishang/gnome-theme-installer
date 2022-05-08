@@ -20,6 +20,13 @@ from getlooks.utils import print_table, message
 from getlooks.looks_path import DESK_THEME_PATH, STATE_PATH
 
 
+path_for = {
+    "GTK3/4 Themes": "themes",
+    "Full Icon Themes": "icons",
+    "Cursors": "cursors",
+}
+
+
 @dataclass
 class FileInfo:
     """
@@ -65,6 +72,22 @@ class ProductInfo:
 
     def date(self) -> datetime:
         return datetime.strptime(f"{self.changed_at}", "%Y-%m-%d %H:%M:%S")
+
+    def __is_type(self, expect: str):
+        type = path_for.get(self.type)
+        if type != None and type == expect:
+            return True
+        else:
+            return False
+
+    def is_icon(self):
+        return self.__is_type("icons")
+
+    def is_theme(self):
+        return self.__is_type("themes")
+
+    def is_cursor(self):
+        return self.__is_type("cursors")
 
     # def __post_init__(self):
     #     files = []
