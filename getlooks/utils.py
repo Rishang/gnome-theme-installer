@@ -213,17 +213,13 @@ def ls(
 
 def extract(path: str, at: str):
     """Extract tar file"""
-
-    if ".tar" in path:
-        with tarfile.open(path) as tar:
-            if not os.path.exists(at):
-                os.makedirs(at)
-            tar.extractall(path=at)
-            message.sucesses(f"""Extracted {path}, at {at}""")
-            return True
-    else:
-        message.error(f"{path} is not tar file.")
-        return False
+    try:
+        shutil.unpack_archive(path, at)
+        message.sucesses(f"""Extracted {path}, at {at}""")
+        return True
+    except:
+        logger.error(f"can't extract: {path}")
+        raise Exception("Invalid file to extract")
 
 
 def download(url: str, at: str):
