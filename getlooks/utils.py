@@ -3,7 +3,6 @@
 import os
 import json
 import random
-import tarfile
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
