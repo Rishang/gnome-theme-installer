@@ -8,7 +8,7 @@
 - **Xfce**
 - **KDE Plasma**
 
-![image 1](https://raw.githubusercontent.com/Rishang/gnome-theme-installer/master/.github/images/get.png)
+![image 1](./.github/images/get.png)
 
 ## gnomelooks
 
