@@ -9,7 +9,7 @@ from copy import deepcopy
 
 # local
 from getlooks.looks_path import STATE_PATH
-from getlooks.utils import JsonState, JsonState, dn_n_extract, print_table, logger
+from getlooks.utils import JsonState, JsonState, dn_n_extract, show_table, logger
 from getlooks.core import (
     ProductInfo,
     DeskEnv,
@@ -109,8 +109,9 @@ def looks_rm(themes: bool = False, icons: bool = False) -> List[str]:
         return []
     theme_path = products[list(products.keys())[0]].install_path
 
-    print_table(
-        [{"id": i, "Theme names": _look_list[i]} for i in range(len(_look_list))]
+    show_table(
+        [{"id": i, "names": _look_list[i]} for i in range(len(_look_list))],
+        title="Remove theme",
     )
     print("Enter id, of file to remove")
     data: list = input().split(",")
@@ -194,7 +195,11 @@ def looks_install(url, p_ids: List[str] = []) -> ProductInfo:
     data = []
     for i in product.files:
         data.append(vars(i))
-    print_table(data, ignore_keys=["type", "is_active", "url", "extracted_files"])
+    show_table(
+        data=data,
+        ignore_keys=["type", "is_active", "url", "extracted_files"],
+        title="Install Themes/Icons",
+    )
 
     path = get_path(product)
     product.install_path = path

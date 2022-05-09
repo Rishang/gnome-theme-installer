@@ -10,7 +10,7 @@ from colorama import Fore
 import typer
 
 # local
-from getlooks.utils import message, git_pull, print_table
+from getlooks.utils import message, show_table
 from getlooks.looks import looks_install, looks_list, looks_rm, looks_log, looks_update
 from getlooks.core import DeskEnv
 
@@ -97,20 +97,20 @@ def ls(
     """
     | List installed themes and icons
     """
-
     print()
+    if (themes or icons) != True:
+        see_help("ls")
+
     _look_list = looks_list(themes=themes, icons=icons)[0]
 
-    if themes:
-        print_table(
-            [{"id": i, "Theme names": _look_list[i]} for i in range(len(_look_list))]
-        )
-    elif icons:
-        print_table(
-            [{"id": i, "Icon names": _look_list[i]} for i in range(len(_look_list))]
-        )
-    else:
-        see_help("ls")
+    title = "Theme names"
+    if icons:
+        title = "Icon names"
+
+    show_table(
+        data=[{"id": i, "names": _look_list[i]} for i in range(len(_look_list))],
+        title=title,
+    )
     print()
 
 

@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup
 from requests.api import patch
 
 # local
-from getlooks.utils import print_table, message
+from getlooks.utils import show_table, message
 from getlooks.looks_path import DESK_THEME_PATH, STATE_PATH
 
 
@@ -136,7 +136,7 @@ class DeskEnv:
             "Which one is your desktop environment ?\n"
             "\nChoose you desktop environment id, \nExample: 1 for gnome\n"
         )
-        print_table([self.valid_env])
+        show_table([self.valid_env], title="Select desktop environment")
 
         print("\nEnter id for your desktop environment to continue: ", end="")
         ans = int(input())

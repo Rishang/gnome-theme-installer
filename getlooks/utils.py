@@ -12,6 +12,10 @@ import logging
 # pipi
 import requests
 from colorama import Fore
+from rich.console import Console
+from rich.text import Text
+from rich.table import Table
+from rich.logging import RichHandler
 
 # locals
 
@@ -19,32 +23,22 @@ from colorama import Fore
 this_file_path = Path(os.path.abspath(__file__)).resolve()
 
 
-def _logger(flag: str = "", format: str = ""):
-    if format == "" or format == None:
-        format = "%(levelname)s|%(name)s| %(message)s"
+def _logger(debug_flag: str = ""):
 
     # message
     logger = logging.getLogger(__name__)
 
-    if os.environ.get(flag) != None:
+    if os.environ.get(debug_flag) != None:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.WARNING)
 
-    # create console handler and set level to debug
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    # create formatter
-    # add formatter to ch
-    formatter = logging.Formatter(format)
-    ch.setFormatter(formatter)
-
-    # add ch to logger
-    logger.addHandler(ch)
+    handler = RichHandler(log_time_format="")
+    logger.addHandler(handler)
     return logger
 
 
-logger = _logger(flag="TEST_THEME_INSTALLER")
+logger = _logger(debug_flag="TEST_THEME_INSTALLER")
 
 
 def git_pull():
@@ -266,75 +260,39 @@ def dn_n_extract(url: str, at: str) -> list:
     return extracted_items
 
 
-def tableDict(data: List[Dict], ignore_keys: List[AnyStr] = []):
-    """"""
+def dict_list_tbl(items=list[dict], ignore_keys: list = []):
+    keys = []
+    data = []
 
-    all: dict = {}
+    for item in items:
+        _tmp: tuple = ()
+        for key in [i for i in item.keys() if i not in ignore_keys]:
 
-    padding: dict = {}
+            if key not in keys:
+                keys.append(key)
+            _tmp += (str(item[key]),)
+        data.append(_tmp)
 
-    _keys = []
-    for d in data:
-        # print(d.keys())
-        for i in d.keys():
-            if i not in _keys:
-                _keys.append(i)
-
-    for ik in ignore_keys:
-        if ik in _keys:
-            _keys.remove(ik)
-
-    for d in data:
-        for i in _keys:
-            _value = d.get(i, "")
-            if all.get(i):
-                all[i] += [_value]
-                # for table padding
-                padding[i] += [len(f"{_value}")]
-            else:
-                all[i] = [_value]
-
-                # for table padding
-                padding[i] = [len(f"{_value}")]
-
-    for i in padding:
-        padding[i] = max(padding[i])
-
-    return all, padding
+    return keys, data
 
 
-def print_table(data: List[Dict], ignore_keys: List = []):
-    """"""
+def show_table(data: List[Dict], ignore_keys: List = [], title: str = ""):
+    """rich table"""
 
-    table, padding = tableDict(data, ignore_keys)
-    underline: int = 0
-
-    if len(data) <= 0:
-        return
-
-    # print column
-    for key in table:
-        if len(key) < padding[key]:
-            pd = padding[key]
-        else:
-            pd = len(key)
-
-        msg = f"{key.upper():<{pd}} | "
-        underline += len(msg)
-
-        # message.random_color(msg, end='')
-        print(Fore.BLUE + msg + Fore.RESET, end="")
+    text = Text(title, style="#D0FF5E bold")
 
     print()
-    print(Fore.LIGHTYELLOW_EX + "-" * (underline - 1))
 
-    # print rows
-    for i in range(len(table[key])):
-        for key in table.keys():
-            if len(key) < padding[key]:
-                pd = padding[key]
-            else:
-                pd = len(key)
-            # print(_pd)
-            message.random_color(f"{table[key][i]:<{pd}} | ", end="")
-        print()
+    table = Table(title=text, style="#8782E9 bold")
+    columns, rows = dict_list_tbl(data, ignore_keys)
+
+    colors = {0: "#F0A45D bold", 1: "#E8678A", 2: "#8CC265", 3: "#76F6FF", 4: "#4AA5F0"}
+
+    for count, col in enumerate(columns):
+        color = colors[count % len(colors)]
+        table.add_column(col, justify="left", style=color, no_wrap=True)
+    for row in rows:
+        table.add_row(*row)
+
+    console = Console()
+    console.print(table)
