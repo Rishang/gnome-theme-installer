@@ -5,7 +5,7 @@ import os
 import shutil
 from typing import List
 from copy import deepcopy
-
+from colorama import Fore
 
 # local
 from getlooks.looks_path import STATE_PATH
@@ -204,7 +204,7 @@ def looks_install(url, p_ids: List[str] = []) -> ProductInfo:
     path = get_path(product)
     product.install_path = path
 
-    print("\nEnter ids from above table,\nOf the files you want to download: ", end="")
+    print(f"{Fore.LIGHTBLUE_EX}\nEnter ids from above table,\nOf the files you want to download: {Fore.RESET}", end="")
     if len(p_ids) == 0:
         p_ids = input().split(",")
     files = []
