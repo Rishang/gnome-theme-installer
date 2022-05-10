@@ -5,11 +5,18 @@ import os
 import shutil
 from typing import List
 from copy import deepcopy
-from colorama import Fore
+from rich.progress import track
 
 # local
 from getlooks.looks_path import STATE_PATH
-from getlooks.utils import JsonState, JsonState, dn_n_extract, show_table, logger
+from getlooks.utils import (
+    JsonState,
+    JsonState,
+    dn_n_extract,
+    show_table,
+    logger,
+    console,
+)
 from getlooks.core import (
     ProductInfo,
     DeskEnv,
@@ -23,7 +30,7 @@ from getlooks.core import (
 
 desk = DeskEnv()
 
-if os.environ.get("TEST_THEME_INSTALLER") == "true":
+if os.environ.get("TEST_THEME_INSTALLER"):
     state_path = f"./test/state.json"
 else:
     state_path = f"{desk.HOME}/{STATE_PATH}-{desk.USER}/state.json"
@@ -33,7 +40,7 @@ def get_path(product: ProductInfo) -> str:
 
     # print(product.type)
 
-    if os.environ.get("TEST_THEME_INSTALLER") == "true":
+    if os.environ.get("TEST_THEME_INSTALLER"):
         path = "./themes/" + product.type
     elif product.type == "Global Themes" and desk.DESK_ENV == "kde":
         path = desk.theme_path("kde_global")
@@ -41,7 +48,7 @@ def get_path(product: ProductInfo) -> str:
         if product.type in path_for:
             path = desk.theme_path(path_for[product.type])
         else:
-            message.warning("Can't identify product category, using current path.")
+            logger.warning("Can't identify product category, using current path.")
             path = "."
     return path
 
@@ -204,11 +211,15 @@ def looks_install(url, p_ids: List[str] = []) -> ProductInfo:
     path = get_path(product)
     product.install_path = path
 
-    print(f"{Fore.LIGHTBLUE_EX}\nEnter ids from above table,\nOf the files you want to download: {Fore.RESET}", end="")
+    console.print(
+        f"\nEnter ids from above table,\nOf the files you want to download: ",
+        style="cyan",
+        end="",
+    )
     if len(p_ids) == 0:
         p_ids = input().split(",")
     files = []
-    for p_id in p_ids:
+    for p_id in track(p_ids, description="Downloading.."):
         _id = int(p_id)
         theme_files = dn_n_extract(product.files[_id].url, product.install_path)
 
@@ -229,16 +240,15 @@ def looks_update():
     state.load(state_path)
 
     if len(state.cache) == 0:
-        message.error(
+        logger.error(
             "No themes installed,"
             + f"you need to install a theme first. check state: {state_path}"
-            "",
-            stop_here=True,
         )
+        exit(1)
 
     cache_products = product_state_cache(state.cache)
 
-    for p_id in cache_products:
+    for p_id in track(cache_products, description="Processing..."):
         _c_product = cache_products[p_id]
         product = scrapGnomeLooks(_c_product.url)
         product.install_path = _c_product.install_path
@@ -261,7 +271,7 @@ def looks_update():
                         _files.append(l_fi)
                     else:
                         _files.append(c_fi)
-                        message.info(f"No updates: {c_fi.name} ")
+                        logger.info(f"No updates: {c_fi.name} ")
                         continue
 
         product.files = _files

@@ -10,21 +10,18 @@ from colorama import Fore
 import typer
 
 # local
-from getlooks.utils import message, show_table
+from getlooks.utils import console, show_table
 from getlooks.looks import looks_install, looks_list, looks_rm, looks_log, looks_update
 from getlooks.core import DeskEnv
 
 
-def see_help(arg: str = "", stop_here: bool = True):
-    return message.error(
+def see_help(arg: str = ""):
+    console.print(
         "This command required arguments, use "
-        + Fore.LIGHTYELLOW_EX
-        + f"{arg} --help"
-        + Fore.RED
-        + " to see them"
-        + Fore.RESET,
-        stop_here,
+        f"[yellow]{arg} --help[reset]"
+        " to see them"
     )
+    exit(1)
 
 
 app = typer.Typer(

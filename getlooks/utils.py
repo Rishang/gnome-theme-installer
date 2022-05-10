@@ -16,8 +16,10 @@ from rich.console import Console
 from rich.text import Text
 from rich.table import Table
 from rich.logging import RichHandler
+from rich import print as rprint
 
 # locals
+console = Console()
 
 # -- code --
 this_file_path = Path(os.path.abspath(__file__)).resolve()
@@ -26,12 +28,17 @@ this_file_path = Path(os.path.abspath(__file__)).resolve()
 def _logger(debug_flag: str = ""):
 
     # message
+    flag = os.environ.get(debug_flag)
     logger = logging.getLogger(__name__)
 
-    if os.environ.get(debug_flag) != None:
+    if flag == None:
+        logger.setLevel(logging.INFO)
+    elif flag == "debug":
         logger.setLevel(logging.DEBUG)
-    else:
+    elif flag == "warning":
         logger.setLevel(logging.WARNING)
+    elif flag == "info":
+        logger.setLevel(logging.INFO)
 
     handler = RichHandler(log_time_format="")
     logger.addHandler(handler)
@@ -40,13 +47,15 @@ def _logger(debug_flag: str = ""):
 
 logger = _logger(debug_flag="TEST_THEME_INSTALLER")
 
-
-def git_pull():
-    """pull git repo"""
-
-    if os.path.exists(str(this_file_path.parent) + "/.git"):
-        os.chdir(this_file_path.parent)
-        os.system("git pull origin main")
+_colors = {
+    "green": "#8CC265",
+    "light_green": "#D0FF5E bold",
+    "blue": "#4AA5F0",
+    "cyan": "#76F6FF",
+    "yellow": "#F0A45D bold",
+    "red": "#E8678A",
+    "purple": "#8782E9 bold",
+}
 
 
 class JsonState:
@@ -140,25 +149,8 @@ class Message:
     def __init__(self):
         pass
 
-    def error(self, message: str, stop_here=False):
-        print(Fore.RED + "ERROR: " + message + Fore.RESET)
-        if stop_here == True:
-            exit(1)
-
     def sucesses(self, message: str):
         print(Fore.LIGHTGREEN_EX + message + Fore.RESET)
-
-    def green(self, message: str):
-        print(Fore.GREEN + message + Fore.RESET)
-
-    def warning(self, message: str):
-        print(Fore.YELLOW + "WARNING: " + message + Fore.RESET)
-
-    def info(self, message: str):
-        print(Fore.LIGHTMAGENTA_EX + "INFO: " + message + Fore.RESET)
-
-    def title(self, message: str):
-        print(Fore.LIGHTCYAN_EX + message + Fore.RESET)
 
     def random_color(self, message: str, **kwargs):
         r_color = random.choice(self.colors)
@@ -208,7 +200,7 @@ def extract(path: str, at: str):
     """Extract tar file"""
     try:
         shutil.unpack_archive(path, at)
-        message.sucesses(f"""Extracted {path}, at {at}""")
+        logger.debug(f"""Extracted {path}, at {at}""")
         return True
     except:
         logger.error(f"can't extract: {path}")
@@ -227,11 +219,11 @@ def download(url: str, at: str):
     if file.status_code == 200:
         with open(f"{at}/{file_name}", "wb") as fw:
             fw.write(file.content)
-        message.info(f"""Downloaded: {file_name} at {at}""")
+        logger.debug(f"""Downloaded: {file_name} at {at}""")
         return f"{at}/{file_name}"
     else:
-        message.error("status_code {file.status_code}", stop_here=True)
-        exit()
+        logger.error(f"request status_code: {file.status_code}")
+        exit(1)
 
 
 def dn_n_extract(url: str, at: str) -> list:
@@ -241,7 +233,7 @@ def dn_n_extract(url: str, at: str) -> list:
     temp_dn = TemporaryDirectory(prefix="looks_dn_", suffix="")
 
     # Download
-    message.info(f"Downloading... \n")
+    logger.info(f"Downloading... \n")
     dp = download(url, at=temp_dn.name)
 
     # extract at tmp, and list folders
@@ -253,7 +245,7 @@ def dn_n_extract(url: str, at: str) -> list:
         if os.path.exists(at_f):
             shutil.rmtree(at_f)
         shutil.move(os.path.join(temp.name, f), at_f)
-        print(f"Moved to: {at_f}")
+        rprint(f"[green]Moved to:[reset] {at_f}")
 
     temp_dn.cleanup()
     temp.cleanup()
@@ -276,17 +268,25 @@ def dict_list_tbl(items=list[dict], ignore_keys: list = []):
     return keys, data
 
 
-def show_table(data: List[Dict], ignore_keys: List = [], title: str = ""):
+def show_table(
+    data: List[Dict], ignore_keys: List = [], title: str = "", border_style=""
+):
     """rich table"""
 
-    text = Text(title, style="#D0FF5E bold")
+    text = Text(title, style=_colors["light_green"])
 
     print()
 
-    table = Table(title=text, style="#8782E9 bold")
+    table = Table(title=text, style=_colors["purple"], border_style=border_style)
     columns, rows = dict_list_tbl(data, ignore_keys)
 
-    colors = {0: "#F0A45D bold", 1: "#E8678A", 2: "#8CC265", 3: "#76F6FF", 4: "#4AA5F0"}
+    colors = {
+        0: _colors["yellow"],
+        1: _colors["red"],
+        2: _colors["green"],
+        3: _colors["cyan"],
+        4: _colors["blue"],
+    }
 
     for count, col in enumerate(columns):
         color = colors[count % len(colors)]

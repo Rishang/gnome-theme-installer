@@ -13,10 +13,9 @@ from typing import Dict, List, Optional
 # pipi
 import requests
 from bs4 import BeautifulSoup
-from requests.api import patch
 
 # local
-from getlooks.utils import show_table, message
+from getlooks.utils import show_table, message, logger
 from getlooks.looks_path import DESK_THEME_PATH, STATE_PATH
 
 
@@ -131,7 +130,7 @@ class DeskEnv:
         if not os.path.isdir(self.state_file.parent):
             os.makedirs(self.state_file.parent)
 
-        message.error("Can't figureout desktop environment")
+        logger.error("Can't figureout desktop environment")
         message.title(
             "Which one is your desktop environment ?\n"
             "\nChoose you desktop environment id, \nExample: 1 for gnome\n"
@@ -208,8 +207,8 @@ def scrapGnomeLooks(url):
         raise Exception(f"Connection timeout {url}")
 
     if gnome_looks_page.status_code == 404:
-        message.error("Page responded 404 (File not found)", stop_here=True)
-        exit()
+        logger.error("Page responded 404 (File not found)")
+        exit(1)
 
     soup = BeautifulSoup(gnome_looks_page.text, "lxml")
 
@@ -236,7 +235,7 @@ def scrapGnomeLooks(url):
             continue
 
         if EXIT_FLAG == True:
-            message.error("variable productViewDataEncoded: not found in source code")
+            logger.error("variable productViewDataEncoded: not found in source code")
             exit(1)
 
     _p = base64.b64decode(p).decode("utf-8")
