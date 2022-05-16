@@ -10,9 +10,18 @@ from colorama import Fore
 import typer
 
 # local
-from getlooks.utils import console, show_table
+from getlooks.utils import console, show_table, logger, logging
 from getlooks.looks import looks_install, looks_list, looks_rm, looks_log, looks_update
 from getlooks.core import DeskEnv
+
+
+def set_debug(flag: bool):
+    if flag:
+        logging.basicConfig(level=logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
+
+# cli debug type alias
+__optionDebug = typer.Option(False, "-d", help="set debug mode.")
 
 
 def see_help(arg: str = ""):
@@ -30,10 +39,14 @@ app = typer.Typer(
 
 
 @app.command()
-def get(url: str = typer.Argument(None, help="looks or pling [URL] of theme/icon")):
+def get(
+    debug: bool = __optionDebug,
+    url: str = typer.Argument(None, help="looks or pling [URL] of theme/icon"),
+):
     """
     | Install new UI themes/icons
     """
+    set_debug(debug)
 
     if url is None or url == "":
         see_help("get")
@@ -44,6 +57,7 @@ def get(url: str = typer.Argument(None, help="looks or pling [URL] of theme/icon
 
 @app.command()
 def update(
+    debug: bool = __optionDebug,
     me: bool = typer.Option(False, "--me", help="Update tool itself"),
     themes: bool = typer.Option(
         False, "-t", "--themes", help="Update all gtk/icon themes"
@@ -52,6 +66,7 @@ def update(
     """
     | Update installed themes and icons via this tool
     """
+    set_debug(debug)
 
     if me:
         os.system("pip install -U gnomelooks")
@@ -63,12 +78,15 @@ def update(
 
 @app.command()
 def rm(
+    debug: bool = __optionDebug,
     themes: bool = typer.Option(False, "-t", "--themes", help="To remove Themes"),
     icons: bool = typer.Option(False, "-i", "--icons", help="To remove Icons"),
 ):
     """
     | Remove installed themes and icons
     """
+    set_debug(debug)
+
     if themes:
         looks_rm(themes=True)
     elif icons:
@@ -88,12 +106,15 @@ def askenv():
 
 @app.command()
 def ls(
+    debug: bool = __optionDebug,
     themes: bool = typer.Option(False, "-t", "--themes", help="To list Themes]"),
     icons: bool = typer.Option(False, "-i", "--icons", help="To list Icons]"),
 ):
     """
     | List installed themes and icons
     """
+    set_debug(debug)
+
     print()
     if (themes or icons) != True:
         see_help("ls")
