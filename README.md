@@ -1,5 +1,8 @@
 # Gnome-looks themes cli downloader
 
+[![Installs](https://static.pepy.tech/personalized-badge/gnomelooks?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads)](https://pepy.tech/project/gnomelooks)
+
+
 **A cli-tool to install and update gnome based Icons, GTK, Cursor themes easily**
 
 ### Supported desktop environments
