@@ -13,8 +13,7 @@
 
 ![image 1](./.github/images/get.png)
 
-## gnomelooks
-
+## gnomelooks cli usage
 
 
 - To Install themes for current user
