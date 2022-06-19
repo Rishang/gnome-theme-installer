@@ -16,12 +16,13 @@ from getlooks.utils import (
     show_table,
     logger,
     console,
+    message
 )
+
 from getlooks.core import (
     ProductInfo,
     DeskEnv,
     scrapGnomeLooks,
-    message,
     product_state_cache,
     path_for,
 )

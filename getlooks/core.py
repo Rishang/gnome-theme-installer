@@ -15,7 +15,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # local
-from getlooks.utils import show_table, message, logger
+from getlooks.utils import show_table, rprint, logger
 from getlooks.looks_path import DESK_THEME_PATH, STATE_PATH
 
 
@@ -131,9 +131,9 @@ class DeskEnv:
             os.makedirs(self.state_file.parent)
 
         logger.error("Can't figureout desktop environment")
-        message.title(
-            "Which one is your desktop environment ?\n"
-            "\nChoose you desktop environment id, \nExample: 1 for gnome\n"
+        rprint(
+            "[yellow]Which one is your desktop environment ?\n"
+            "\nChoose you desktop environment id,[reset] \nExample: 1 for gnome\n"
         )
         show_table([self.valid_env], title="Select desktop environment")
 
