@@ -2,7 +2,7 @@
 
 [![Installs](https://static.pepy.tech/personalized-badge/gnomelooks?period=total&units=international_system&left_color=black&right_color=orange&left_text=Downloads)](https://pepy.tech/project/gnomelooks) ![Release version](https://img.shields.io/github/v/release/Rishang/gnome-theme-installer.svg?style=flat-square
 )
-
+[![Python Version](https://img.shields.io/badge/Python-3.10-xx.svg)](https://shields.io/)
 
 **A cli-tool to install and update gnome based Icons, GTK, Cursor themes easily**
 
