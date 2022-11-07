@@ -1,0 +1,24 @@
+name: PyPy Release
+on:
+  release:
+    types: [published, edited]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: tag name
+        run: echo $GITHUB_REF_NAME
+       
+      - name: Config Poetry
+        run: |
+          pip install -U poetry
+
+          poetry install
+          poetry build
+      
+      - name: publish
+        run: |
+          poetry publish -u ${{ secrets.USERNAME }} -p ${{ secrets.PASSWORD }}
