@@ -15,7 +15,7 @@
 
 ![image 1](./.github/images/get.png)
 
-## gnomelooks cli usage
+## gnome looks cli usage
 
 
 - To Install themes for current user
@@ -30,7 +30,7 @@
 
     pip3 install -U gnomelooks
 
-## gnomelooks help Page
+## gnome looks help Page
 
     ~$ gnomelooks --help
         Usage: gnomelooks [OPTIONS] COMMAND [ARGS]...
