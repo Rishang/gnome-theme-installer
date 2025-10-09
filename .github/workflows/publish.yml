@@ -32,5 +32,5 @@ jobs:
 
       - name: publish
         run: |
-          poetry publish --build --username __token__ --password ${{ secrets.PYPI_TOKEN }} --no-interaction
+          poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }} --no-interaction -n
 
