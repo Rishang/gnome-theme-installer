@@ -18,7 +18,6 @@ class ShellOutputs:
 
 
 class Shell:
-
     line_breaks = "\n"
     popen_args = {"shell": True, "stdout": subprocess.PIPE, "stderr": subprocess.PIPE}
 

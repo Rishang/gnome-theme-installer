@@ -126,7 +126,6 @@ class DeskEnv:
                 self.DESK_ENV = state.strip()
 
     def env_prompt(self):
-
         if not os.path.isdir(self.state_file.parent):
             os.makedirs(self.state_file.parent)
 
@@ -210,35 +209,25 @@ def scrapGnomeLooks(url):
         logger.error("Page responded 404 (File not found)")
         exit(1)
 
-    soup = BeautifulSoup(gnome_looks_page.text, "lxml")
+    soup = BeautifulSoup(gnome_looks_page.text, "html.parser")
+
+    js_scripts = soup.find_all("script", type="text/javascript")
 
     # where a variable contain json data of theme-files
 
     # product details
-    pattern = r"productViewDataEncoded = '(ey.+)';var categoryId"
+    pattern = r"productViewDataEncoded = '(ey.+)';"
+    _p = None
+    # Search all <script> tags
+    for script in js_scripts:
+        text = script.string or ""
+        match = re.search(pattern, text)
+        if match:
+            _p = base64.b64decode(match[1]).decode("utf-8")
+            break
 
-    # if api-json is not present at jspath, bruteforce for jspath
-    script_child = [n for n in range(10, 26)]
-    for blind_id in script_child:
-        try:
-            productData = soup.select_one(
-                f"#od-body > script:nth-child({blind_id})"
-            ).string
-            p = re.search(pattern, productData)[1]
-            p = base64.decode(p)
-
-            if re.search(pattern, productData):
-                EXIT_FLAG = False
-                break
-        except:
-            EXIT_FLAG = True
-            continue
-
-        if EXIT_FLAG == True:
-            logger.error("variable productViewDataEncoded: not found in source code")
-            exit(1)
-
-    _p = base64.b64decode(p).decode("utf-8")
+    if _p == None:
+        raise Exception("No data found")
 
     # todict
     p_info = json.loads(_p)
@@ -260,7 +249,7 @@ def scrapGnomeLooks(url):
             "url": _f["url"],
             "changed_at": _f["updated_timestamp"],
             "downloads": _f["downloaded_count_uk"],
-            "size": f"{int(_f['size'])/1000000}"[:4] + " Mb",
+            "size": f"{int(_f['size']) / 1000000}"[:4] + " Mb",
         }
         if __t["is_active"]:
             f_list.append(FileInfo(**__t))
@@ -287,7 +276,6 @@ def scrapGnomeLooks(url):
 
 
 def product_state_cache(data: Dict[str, dict]) -> Dict[str, ProductInfo]:
-
     products: Dict[str, ProductInfo] = dict()
     for p in data:
         product = ProductInfo(**data[p])

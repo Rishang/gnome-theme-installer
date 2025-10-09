@@ -10,5 +10,5 @@ GTK*
 __pycache__
 state.json
 dist
-poetry.lock
+# poetry.lock
 .pipenv

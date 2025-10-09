@@ -11,12 +11,11 @@ from rich.progress import track
 from getlooks.looks_path import STATE_PATH
 from getlooks.utils import (
     JsonState,
-    JsonState,
     dn_n_extract,
     show_table,
     logger,
     console,
-    message
+    message,
 )
 
 from getlooks.core import (
@@ -32,13 +31,12 @@ from getlooks.core import (
 desk = DeskEnv()
 
 if os.environ.get("TEST_THEME_INSTALLER"):
-    state_path = f"./test/state.json"
+    state_path = "./test/state.json"
 else:
     state_path = f"{desk.HOME}/{STATE_PATH}-{desk.USER}/state.json"
 
 
 def get_path(product: ProductInfo) -> str:
-
     # print(product.type)
 
     if os.environ.get("TEST_THEME_INSTALLER"):
@@ -71,7 +69,6 @@ def state_update_rm(removed_items: List[str]):
                     continue
 
             for _f in product.files:
-
                 if file_name in _f.extracted_files:
                     if len(_f.extracted_files) == 1:
                         product.files.remove(_f)
@@ -144,7 +141,6 @@ def looks_rm(themes: bool = False, icons: bool = False) -> List[str]:
 
 
 def looks_log(product: ProductInfo):
-
     state = JsonState()
     state.load(state_path)
 
@@ -174,7 +170,6 @@ def looks_log(product: ProductInfo):
 
 
 def looks_install(url, p_ids: List[str] = []) -> ProductInfo:
-
     """
     valid list for theme download
     [   "www.opendesktop.org/",
@@ -213,7 +208,7 @@ def looks_install(url, p_ids: List[str] = []) -> ProductInfo:
     product.install_path = path
 
     console.print(
-        f"\nEnter ids from above table,\nOf the files you want to download: ",
+        "\nEnter ids from above table,\nOf the files you want to download: ",
         style="cyan",
         end="",
     )
@@ -234,7 +229,6 @@ def looks_install(url, p_ids: List[str] = []) -> ProductInfo:
 
 
 def looks_update():
-
     state = JsonState()
     desk.check_env()
 
@@ -258,11 +252,9 @@ def looks_update():
 
         _files: list = []
         for c_fi in _c_product.files:
-
             # latest product files -> _l_fi
             for l_fi in product.files:
                 if l_fi.name == c_fi.name:
-
                     if l_fi.date() > c_fi.date():
                         _id = int(l_fi.id)
                         ex_files = dn_n_extract(

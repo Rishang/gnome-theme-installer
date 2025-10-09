@@ -20,21 +20,21 @@ def set_debug(flag: bool):
         logging.basicConfig(level=logging.DEBUG)
         logger.setLevel(logging.DEBUG)
 
+
 # cli debug type alias
 __optionDebug = typer.Option(False, "-d", help="set debug mode.")
 
 
 def see_help(arg: str = ""):
     console.print(
-        "This command required arguments, use "
-        f"[yellow]{arg} --help[reset]"
-        " to see them"
+        f"This command required arguments, use [yellow]{arg} --help[reset] to see them"
     )
     exit(1)
 
 
 app = typer.Typer(
-    help=f"{Fore.LIGHTGREEN_EX} Theme Installer for Gnome, Xfce4, Kde {Fore.RESET}"
+    help=f"{Fore.LIGHTGREEN_EX} Theme Installer for Gnome, Xfce4, Kde {Fore.RESET}",
+    pretty_exceptions_enable=False,
 )
 
 

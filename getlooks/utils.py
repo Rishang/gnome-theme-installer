@@ -6,7 +6,7 @@ import random
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import AnyStr, List, Dict
+from typing import List, Dict
 import logging
 
 # pipi
@@ -26,7 +26,6 @@ this_file_path = Path(os.path.abspath(__file__)).resolve()
 
 
 def _logger(debug_flag: str = ""):
-
     # message
     flag = os.environ.get(debug_flag)
     logger = logging.getLogger(__name__)
@@ -59,12 +58,10 @@ _colors = {
 
 
 class JsonState:
-
     cache: Dict[str, Dict] = dict()
     cache_path: str = ""
 
     def add(self, key: str, data: dict, dublicate: bool = False):
-
         if not dublicate:
             if key not in self.cache.keys():
                 self.cache[key] = data
@@ -98,7 +95,6 @@ class JsonState:
             return
 
         if not os.path.getsize(cache_path) == 0:
-
             with open(cache_path, "r") as c:
                 data = json.loads(c.read())
                 self.cache = data
@@ -233,7 +229,7 @@ def dn_n_extract(url: str, at: str) -> list:
     temp_dn = TemporaryDirectory(prefix="looks_dn_", suffix="")
 
     # Download
-    logger.info(f"Downloading... \n")
+    logger.info("Downloading... \n")
     dp = download(url, at=temp_dn.name)
 
     # extract at tmp, and list folders
@@ -259,7 +255,6 @@ def dict_list_tbl(items=list[dict], ignore_keys: list = []):
     for item in items:
         _tmp: tuple = ()
         for key in [i for i in item.keys() if i not in ignore_keys]:
-
             if key not in keys:
                 keys.append(key)
             _tmp += (str(item[key]),)
