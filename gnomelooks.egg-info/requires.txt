@@ -1,0 +1,6 @@
+beautifulsoup4
+colorama
+lxml
+requests
+rich>=12.4.0
+typer>=0.7.0

@@ -1,5 +1,6 @@
 .vscode/
 env/
+.venv/
 .temp/
 **tmp**
 .ipynb_checkpoints
@@ -10,5 +11,4 @@ GTK*
 __pycache__
 state.json
 dist
-# poetry.lock
 .pipenv

@@ -69,7 +69,7 @@ def update(
     set_debug(debug)
 
     if me:
-        os.system("pip install -U gnomelooks")
+        os.system("uv tool upgrade gnomelooks")
     elif themes:
         looks_update()
     else:

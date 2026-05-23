@@ -1,0 +1,15 @@
+LICENSE
+README.md
+pyproject.toml
+getlooks/__init__.py
+getlooks/cli.py
+getlooks/core.py
+getlooks/looks.py
+getlooks/looks_path.py
+getlooks/utils.py
+gnomelooks.egg-info/PKG-INFO
+gnomelooks.egg-info/SOURCES.txt
+gnomelooks.egg-info/dependency_links.txt
+gnomelooks.egg-info/entry_points.txt
+gnomelooks.egg-info/requires.txt
+gnomelooks.egg-info/top_level.txt

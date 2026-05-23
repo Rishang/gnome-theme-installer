@@ -6,16 +6,16 @@ URL="https://www.gnome-look.org/s/Gnome/p/1253385/"
 export TEST_THEME_INSTALLER=debug
 
 run:
-	python3 cli.py get ${URL}
+	uv run gnomelooks get ${URL}
 
 ls:
-	python3 cli.py ls -t
+	uv run gnomelooks ls -t
 
 rm:
-	python3 cli.py rm -t
+	uv run gnomelooks rm -t
 
 update:
-	python3 cli.py update -t
+	uv run gnomelooks update -t
 
 sudo_run:
-	sudo python3 cli.py get ${URL}
+	sudo uv run gnomelooks get ${URL}

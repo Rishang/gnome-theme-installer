@@ -1,30 +1,32 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "gnomelooks"
 version = "0.3.0"
-readme = "README.md"
 description = ""
-authors = ["Rishang <rishangbhavsarcs@gmail.com>"]
-packages = [
-    { include = "getlooks" }
+readme = "README.md"
+authors = [{ name = "Rishang", email = "rishangbhavsarcs@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "beautifulsoup4",
+    "colorama",
+    "lxml",
+    "requests",
+    "rich>=12.4.0",
+    "typer>=0.7.0",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-typer = ">=0.7.0"
-beautifulsoup4 = "*"
-lxml = "*"
-colorama = "*"
-requests = "*"
-rich = ">=12.4.0"
-
-[tool.poetry.scripts]
+[project.scripts]
 gnomelooks = "getlooks.cli:app"
 
-[tool.poetry.dev-dependencies]
-pytest = ">=5.2"
-mypy = "*"
-black = "*"
+[dependency-groups]
+dev = [
+    "black",
+    "mypy",
+    "pytest>=5.2",
+]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.packages.find]
+include = ["getlooks*"]

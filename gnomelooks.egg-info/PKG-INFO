@@ -1,3 +1,18 @@
+Metadata-Version: 2.4
+Name: gnomelooks
+Version: 0.3.0
+Author-email: Rishang <rishangbhavsarcs@gmail.com>
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: beautifulsoup4
+Requires-Dist: colorama
+Requires-Dist: lxml
+Requires-Dist: requests
+Requires-Dist: rich>=12.4.0
+Requires-Dist: typer>=0.7.0
+Dynamic: license-file
+
 # Gnome looks themes downloader
 
 [![Python Version](https://img.shields.io/badge/Python-3.10-xx.svg)](https://shields.io/)
