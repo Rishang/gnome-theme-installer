@@ -30,7 +30,7 @@ def _logger(debug_flag: str = ""):
     flag = os.environ.get(debug_flag)
     logger = logging.getLogger(__name__)
 
-    if flag == None:
+    if flag is None:
         logger.setLevel(logging.INFO)
     elif flag == "debug":
         logger.setLevel(logging.DEBUG)
@@ -75,7 +75,7 @@ class JsonState:
             self.add(key, data)
             return True
 
-        if key != None:
+        if key is not None:
             keys = self.cache[key].keys()
 
         if not keys == data.keys():
@@ -198,7 +198,7 @@ def extract(path: str, at: str):
         shutil.unpack_archive(path, at)
         logger.debug(f"""Extracted {path}, at {at}""")
         return True
-    except:
+    except Exception:
         logger.error(f"can't extract: {path}")
         raise Exception("Invalid file to extract")
 

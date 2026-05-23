@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+# ruff: noqa: E402
 import sys
 import os
 
@@ -116,7 +117,7 @@ def ls(
     set_debug(debug)
 
     print()
-    if (themes or icons) != True:
+    if not (themes or icons):
         see_help("ls")
 
     _look_list = looks_list(themes=themes, icons=icons)[0]

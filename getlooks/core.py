@@ -74,7 +74,7 @@ class ProductInfo:
 
     def __is_type(self, expect: str):
         type = path_for.get(self.type)
-        if type != None and type == expect:
+        if type is not None and type == expect:
             return True
         else:
             return False
@@ -226,7 +226,7 @@ def scrapGnomeLooks(url):
             _p = base64.b64decode(match[1]).decode("utf-8")
             break
 
-    if _p == None:
+    if _p is None:
         raise Exception("No data found")
 
     # todict
